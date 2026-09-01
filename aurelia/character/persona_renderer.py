@@ -1,9 +1,9 @@
 """Aurelia persona renderer for final user-visible responses.
 
-This module is the character boundary between verified cognitive content and
-Aurelia's affect, expression style, and persistent character state. Persona
-rendering may shape presentation, but it must not invent evidence or bypass the
-final verification firewall.
+This module is the character boundary between cognitive content and Aurelia's
+affect, expression style, and character state. Persona rendering may shape
+presentation, but it must not invent evidence or bypass the final verification
+firewall.
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ from aurelia.character.affect_engine import (
 )
 from aurelia.character.aurelia_state import AureliaStateManager
 from aurelia.character.expression_policy import ExpressionPolicyManager, ExpressionStyle
+from aurelia.contracts.core_types import VerificationSeverity
 from aurelia.llm.response_renderer import RenderedResponse
 
 
@@ -37,6 +38,20 @@ class PersonaRenderedResponse:
 
 class PersonaRenderer:
     """Apply Aurelia's real affect, expression policy, and state manager."""
+
+    EXPRESSION_MAP = {
+        "neutral": ("01. Neutral / Observing", "01-neutral-observing.png"),
+        "confident": ("02. Subtle Confident Smile", "02-subtle-confident-smile.png"),
+        "approval": ("03. Soft Approval", "03-soft-approval.png"),
+        "focused": ("04. Focused Listening", "04-focused-listening.png"),
+        "analyzing": ("05. Analyzing (Raised Brow)", "05-analyzing-raised-brow.png"),
+        "serious": ("06. Serious", "06-serious.png"),
+        "warning": ("07. Strict Warning", "07-strict-warning.png"),
+        "disappointed": ("08. Disappointed", "08-disappointed.png"),
+        "skeptical": ("09. Skeptical", "09-skeptical.png"),
+        "concerned": ("10. Concerned", "10-concerned.png"),
+        "empathetic": ("11. Empathetic", "11-empathetic.png"),
+    }
 
     def __init__(self) -> None:
         self.affect_engine = AffectEngine()
@@ -87,6 +102,8 @@ class PersonaRenderer:
 
         # Compliance is checked on the *final* persona text, never the pre-persona draft.
         compliance = self.expression_manager.check_compliance(styled)
+        violations = tuple(str(item) for item in compliance["violations"])
+        blocking_violations = self._blocking_policy_violations(violations)
         active_traits = self.state_manager.get_active_traits()
         return PersonaRenderedResponse(
             content=styled,
@@ -101,11 +118,62 @@ class PersonaRenderer:
                 "evidence_available": evidence_available,
                 "cognitive_state": cognitive_state,
                 "compliant": bool(compliance["compliant"]),
+                "publish_compliant": not blocking_violations,
                 "compliance_score": float(compliance["compliance_score"]),
-                "violations": tuple(compliance["violations"]),
-                "warnings": tuple(compliance["warnings"]),
+                "violations": violations,
+                "blocking_violations": blocking_violations,
+                "warnings": tuple(str(item) for item in compliance["warnings"]),
             },
         )
+
+    @classmethod
+    def resolve_expression(
+        cls,
+        *,
+        emotion: Emotion,
+        cognitive_state: str,
+        verification_severity: VerificationSeverity,
+    ) -> tuple[str, str]:
+        """Resolve canonical expression with verification severity as the final veto."""
+        if verification_severity == VerificationSeverity.BLOCKER:
+            key = "warning"
+        elif verification_severity == VerificationSeverity.ERROR:
+            key = "serious"
+        elif emotion in {Emotion.SUPPORTIVE, Emotion.EMPATHETIC}:
+            key = "empathetic"
+        elif emotion in {Emotion.ENCOURAGING, Emotion.CELEBRATORY}:
+            key = "approval"
+        elif emotion == Emotion.CONFIDENT:
+            key = "confident"
+        elif emotion == Emotion.CAUTIOUS:
+            key = "skeptical"
+        elif emotion == Emotion.CONCERNED:
+            key = "concerned"
+        else:
+            state_upper = cognitive_state.upper()
+            if "WARNING" in state_upper or "ENTITLED" in state_upper:
+                key = "warning"
+            elif "DISAPPOINTED" in state_upper or "UNPREPARED" in state_upper:
+                key = "disappointed"
+            elif "SKEPTICAL" in state_upper or "UNVERIFIED" in state_upper:
+                key = "skeptical"
+            elif "BURNOUT" in state_upper or "CONCERNED" in state_upper:
+                key = "concerned"
+            elif "ANALYZING" in state_upper or "CALCULATING" in state_upper:
+                key = "analyzing"
+            elif "SERIOUS" in state_upper or "REORG" in state_upper:
+                key = "serious"
+            elif "APPROVAL" in state_upper or "HIGH_METRIC" in state_upper:
+                key = "approval"
+            elif "CONFIDENT" in state_upper or "VERIFIED_PLAN" in state_upper:
+                key = "confident"
+            elif "EMPATHETIC" in state_upper or "PIVOT" in state_upper:
+                key = "empathetic"
+            elif "LISTENING" in state_upper or "FOCUSED" in state_upper:
+                key = "focused"
+            else:
+                key = "neutral"
+        return key, f"aurelia-expressions/{cls.EXPRESSION_MAP[key][1]}"
 
     @staticmethod
     def _combine_with_cognitive_state(
@@ -137,6 +205,28 @@ class PersonaRenderer:
                 alternatives=[Emotion.NEUTRAL],
             )
         return suggestion
+
+    @staticmethod
+    def _blocking_policy_violations(violations: tuple[str, ...]) -> tuple[str, ...]:
+        """Return only policy failures that make the characterized text unsafe to publish.
+
+        The legacy expression policy also flags broad stylistic words such as
+        "never". Those are useful review signals but are not automatically unsafe.
+        Explicit promises and guarantees are publish blockers.
+        """
+        blocking_markers = (
+            "guarantee",
+            "promise",
+            "absolutely certain",
+            "overpromising language: 'absolutely'",
+            "overpromising language: 'definitely'",
+            "overpromising language: 'certainly'",
+        )
+        return tuple(
+            violation
+            for violation in violations
+            if any(marker in violation.lower() for marker in blocking_markers)
+        )
 
     def _apply_emotional_expression(
         self,
