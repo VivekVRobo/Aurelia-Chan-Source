@@ -78,7 +78,9 @@ class CognitiveDAGExecutor:
             unknown_dependencies = set(node.dependencies) - known_nodes
             if unknown_dependencies:
                 missing = ", ".join(sorted(unknown_dependencies))
-                raise ValueError(f"Node '{node.node_id}' references unknown dependencies: {missing}")
+                raise ValueError(
+                    f"Node '{node.node_id}' references unknown dependencies: {missing}"
+                )
             if self._registry.get(node.capability_id) is None:
                 raise ValueError(
                     f"Node '{node.node_id}' references unregistered capability "
