@@ -12,7 +12,6 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 
-
 SCHEMA_VERSION = "rci.character_response.v1"
 
 
