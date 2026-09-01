@@ -20,6 +20,14 @@ env/
 .coverage
 htmlcov/
 
+# Local persistent runtime state
+data/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
 # Logs & temporary files
 *.log
 *.tmp

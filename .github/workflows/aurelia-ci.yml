@@ -26,30 +26,42 @@ jobs:
             aurelia/cognition/planner.py \
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
+            aurelia/persistence/database.py \
+            aurelia/runtime/app_bootstrap.py \
             aurelia/runtime/capability_catalog.py \
             aurelia/runtime/capability_handlers.py \
             aurelia/runtime/cognitive_runtime.py \
             aurelia/runtime/dag_verification.py \
             aurelia/runtime/grounding.py \
             aurelia/runtime/health.py \
+            aurelia/runtime/persistence.py \
             test_dag_execution.py \
+            test_persistence_runtime.py \
             test_runtime_stabilization.py \
             test_v4_phase10_integration.py
           ruff format --check \
             aurelia/cognition/planner.py \
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
+            aurelia/persistence/database.py \
+            aurelia/runtime/app_bootstrap.py \
             aurelia/runtime/capability_catalog.py \
             aurelia/runtime/capability_handlers.py \
             aurelia/runtime/cognitive_runtime.py \
             aurelia/runtime/dag_verification.py \
             aurelia/runtime/grounding.py \
             aurelia/runtime/health.py \
+            aurelia/runtime/persistence.py \
             test_dag_execution.py \
+            test_persistence_runtime.py \
             test_runtime_stabilization.py \
             test_v4_phase10_integration.py
       - name: Runtime stabilization regression tests
-        run: python -m unittest -v test_runtime_stabilization test_dag_execution
+        run: |
+          python -m unittest -v \
+            test_runtime_stabilization \
+            test_dag_execution \
+            test_persistence_runtime
 
   cognitive-os-v4-v6:
     runs-on: ubuntu-latest
