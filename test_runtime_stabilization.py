@@ -34,8 +34,16 @@ class TestRuntimeStabilization(unittest.TestCase):
         self.assertEqual(result.decision_receipt.hypotheses_considered, ())
         self.assertIsNone(result.decision_receipt.selected_hypothesis_id)
         self.assertEqual(result.decision_receipt.critic_scores, {})
-        self.assertIn(
-            "DeterministicResponseSynthesizer",
+        self.assertEqual(
+            result.decision_receipt.capabilities_invoked,
+            (
+                "specialist.evaluate",
+                "response.render.aurelia",
+                "verification.firewall.verify",
+            ),
+        )
+        self.assertEqual(
+            result.trace.specialists_invoked,
             result.decision_receipt.capabilities_invoked,
         )
 
