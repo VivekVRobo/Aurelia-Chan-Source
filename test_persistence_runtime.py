@@ -64,9 +64,7 @@ class TestRuntimePersistence(unittest.TestCase):
         self.assertEqual(first.persistence.approved_memory_ids, ("fact_scope_1",))
         self.assertEqual(runtime.database.count_rows("canonical_facts"), 1)
 
-        second = runtime.process_query(
-            "What is my leadership_scope for Director of Engineering?"
-        )
+        second = runtime.process_query("What is my leadership_scope for Director of Engineering?")
         self.assertGreater(second.trace.memories_retrieved_count, 0)
         persistent = runtime.persistence.retrieval_candidates()
         self.assertTrue(any(item["source_type"] == "canonical_fact" for item in persistent))
