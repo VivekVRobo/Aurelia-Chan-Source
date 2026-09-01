@@ -1,11 +1,11 @@
-"""Aurelia Cognitive OS V4 executable cognitive runtime."""
+"""Aurelia Cognitive OS V4 executable and persistent cognitive runtime."""
 
 from __future__ import annotations
 
 import hashlib
-import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from uuid import uuid4
 
 from aurelia.artifacts.schemas import ExecutiveArtifact
 from aurelia.character.director import CharacterDirector
@@ -18,9 +18,12 @@ from aurelia.contracts.snapshot import CognitiveSnapshot
 from aurelia.execution.dag_executor import CognitiveDAGExecutor
 from aurelia.execution.executor import TypedExecutor
 from aurelia.execution.registry import CapabilityRegistry
+from aurelia.memory.write_policy import MemoryCandidate
+from aurelia.persistence.database import CognitiveDatabase
 from aurelia.response.trace import SafeCognitiveTrace
 from aurelia.runtime.capability_catalog import RuntimeCapabilityCatalog, RuntimeExecutionContext
 from aurelia.runtime.grounding import RuntimeGrounder
+from aurelia.runtime.persistence import PersistenceCommitResult, RuntimePersistence
 from aurelia.understanding.intent import SemanticMeaningEngine
 from aurelia.verification.firewall import VerificationReport
 
@@ -41,17 +44,25 @@ class CognitiveCycleResponse:
     verification_report: VerificationReport
     artifacts: tuple[ExecutiveArtifact, ...]
     decision_receipt: DecisionReceipt
+    persistence: PersistenceCommitResult
 
 
 class AureliaCognitiveRuntime:
-    """Compile, execute, verify, and record one Aurelia interaction."""
+    """Compile, execute, verify, persist, and record one Aurelia interaction."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        database: CognitiveDatabase | None = None,
+        db_path: str = ":memory:",
+    ) -> None:
         self.registry = CapabilityRegistry()
         RuntimeCapabilityCatalog.register_all(self.registry)
         self.executor = TypedExecutor(self.registry)
         self.dag_executor = CognitiveDAGExecutor(self.registry)
         self.grounder = RuntimeGrounder()
+        self.database = database or CognitiveDatabase(db_path)
+        self.persistence = RuntimePersistence(self.database)
         self.receipts: dict[str, DecisionReceipt] = {}
 
     def process_query(
@@ -60,11 +71,12 @@ class AureliaCognitiveRuntime:
         user_role: str = "Senior Engineering Manager",
         target_role: str = "Director of Engineering",
         chat_history: list[dict[str, str]] | None = None,
+        memory_candidates: tuple[MemoryCandidate, ...] = (),
     ) -> CognitiveCycleResponse:
-        """Execute the compiled DAG and publish only verified output."""
+        """Execute, verify, and atomically persist the compiled cognitive DAG."""
         intent, entities = SemanticMeaningEngine.analyze(user_text)
         meaning = MeaningFrame(
-            frame_id=f"mf_{int(time.time() * 1000)}",
+            frame_id=f"mf_{uuid4().hex}",
             raw_input=user_text,
             intent=intent,
         )
@@ -75,7 +87,7 @@ class AureliaCognitiveRuntime:
             status="active",
         )
         snapshot = CognitiveSnapshot(
-            snapshot_id=f"snap_{int(time.time() * 1000)}",
+            snapshot_id=f"snap_{uuid4().hex}",
             created_at=datetime.now(UTC),
             meaning=meaning,
             user_id="local_user",
@@ -97,6 +109,7 @@ class AureliaCognitiveRuntime:
             target_role=target_role,
             active_goal=goal,
             chat_history=chat_history,
+            persistent_candidates=self.persistence.retrieval_candidates(),
             top_k=min(5, budget.max_retrieval_items),
         )
         runtime_context = RuntimeExecutionContext(
@@ -164,7 +177,7 @@ class AureliaCognitiveRuntime:
         )
 
         receipt = DecisionReceipt(
-            decision_id=f"dec_{int(time.time() * 1000)}",
+            decision_id=f"dec_{uuid4().hex}",
             snapshot_id=snapshot.snapshot_id,
             request_text=user_text,
             intent_type=intent.value,
@@ -182,6 +195,11 @@ class AureliaCognitiveRuntime:
             confidence_score=confidence / 100.0,
             deterministic_replay_hash=self._stable_response_hash(response_prose),
         )
+        persistence_result = self.persistence.commit_verified_cycle(
+            receipt=receipt,
+            artifacts=artifacts,
+            memory_candidates=memory_candidates,
+        )
         self.receipts[receipt.decision_id] = receipt
 
         return CognitiveCycleResponse(
@@ -193,6 +211,7 @@ class AureliaCognitiveRuntime:
             verification_report=verification_report,
             artifacts=artifacts,
             decision_receipt=receipt,
+            persistence=persistence_result,
         )
 
     @staticmethod
