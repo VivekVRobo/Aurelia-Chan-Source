@@ -108,8 +108,7 @@ class CognitiveDatabase:
 
     def _ensure_column(self, table: str, column: str, definition: str) -> None:
         existing = {
-            str(row["name"])
-            for row in self.conn.execute(f"PRAGMA table_info({table})").fetchall()
+            str(row["name"]) for row in self.conn.execute(f"PRAGMA table_info({table})").fetchall()
         }
         if column not in existing:
             self.conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
