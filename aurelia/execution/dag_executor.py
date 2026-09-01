@@ -133,8 +133,7 @@ class CognitiveDAGExecutor:
                             status=NodeExecutionStatus.BLOCKED,
                             dependencies=node.dependencies,
                             reason=(
-                                "Blocked by failed dependencies: "
-                                + ", ".join(failed_dependencies)
+                                "Blocked by failed dependencies: " + ", ".join(failed_dependencies)
                             ),
                         )
                     )
@@ -175,9 +174,7 @@ class CognitiveDAGExecutor:
             if not progressed:
                 raise RuntimeError("Cognitive DAG execution stalled despite prior validation.")
 
-        success = all(
-            record.status == NodeExecutionStatus.COMPLETED for record in records
-        )
+        success = all(record.status == NodeExecutionStatus.COMPLETED for record in records)
         return PlanExecutionResult(
             plan_id=plan.plan_id,
             success=success,
