@@ -2,9 +2,9 @@
 
 import unittest
 
-from integrated_backend import app
 from aurelia.runtime.cognitive_runtime import AureliaCognitiveRuntime, CognitiveCycleResponse
 from aurelia.runtime.health import HealthSupervisor
+from integrated_backend import app
 
 
 class TestPhase10Integration(unittest.TestCase):
