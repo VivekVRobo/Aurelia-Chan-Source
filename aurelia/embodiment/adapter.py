@@ -64,7 +64,9 @@ class AureliaEmbodimentAdapter:
         if not result.decision_receipt.verification_passed:
             raise EmbodimentContractError("Decision receipt is not verified for embodiment.")
         if not result.persistence.committed:
-            raise EmbodimentContractError("Uncommitted output cannot cross the embodiment boundary.")
+            raise EmbodimentContractError(
+                "Uncommitted output cannot cross the embodiment boundary."
+            )
         if result.expression != result.persona.expression:
             raise EmbodimentContractError("Legacy and typed character expressions diverged.")
         if result.portrait_path != result.persona.portrait_path:
