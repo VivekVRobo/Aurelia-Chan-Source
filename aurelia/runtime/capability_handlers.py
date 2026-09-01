@@ -10,6 +10,7 @@ from aurelia.cognition.critic import EvidenceCritic, RiskCritic, StrategicCritic
 from aurelia.cognition.hypotheses import CognitiveSearchEngine, StrategicHypothesis
 from aurelia.contracts.meaning_frame import IntentType
 from aurelia.llm.ollama_cortex import LocalOllamaCortex
+from aurelia.llm.response_renderer import RenderedResponse, ResponseStyle, ResponseTone
 from aurelia.solvers.numerical import EquityGrant, Money, NumericalFirewall
 from aurelia.solvers.simulation import MonteCarloSimulator
 from aurelia.verification.firewall import MasterVerificationFirewall
@@ -27,16 +28,20 @@ def response_format_direct(*, context: Any, dependencies: dict[str, Any]) -> dic
     memory = dependencies.get("mem_lookup", {})
     if memory.get("found"):
         item = memory["item"]
-        return {
-            "response_text": f"The most relevant stored context is: {item.content}",
-            "cognitive_state": "FOCUSED",
-            "confidence": max(55.0, min(95.0, item.composite_score * 100.0)),
-        }
-    return {
-        "response_text": "I do not have a grounded stored value for that yet.",
-        "cognitive_state": "FOCUSED",
-        "confidence": 55.0,
-    }
+        return _apply_persona(
+            context=context,
+            response_text=f"The most relevant stored context is: {item.content}",
+            cognitive_state="FOCUSED",
+            confidence=max(55.0, min(95.0, item.composite_score * 100.0)),
+            renderer="GroundedMemoryFormatter",
+        )
+    return _apply_persona(
+        context=context,
+        response_text="I do not have a grounded stored value for that yet.",
+        cognitive_state="FOCUSED",
+        confidence=55.0,
+        renderer="GroundedMemoryFormatter",
+    )
 
 
 def parse_offer(*, context: Any, dependencies: dict[str, Any]) -> dict[str, Any]:
@@ -215,19 +220,21 @@ def render_response(*, context: Any, dependencies: dict[str, Any]) -> dict[str, 
         ),
     )
     if model_response:
-        return {
-            "response_text": model_response,
-            "cognitive_state": "CONFIDENT",
-            "confidence": 92.0,
-            "renderer": "LocalOllamaCortex",
-        }
+        return _apply_persona(
+            context=context,
+            response_text=model_response,
+            cognitive_state="CONFIDENT",
+            confidence=92.0,
+            renderer="LocalOllamaCortex",
+        )
     if specialist:
-        return {
-            "response_text": specialist["response_text"],
-            "cognitive_state": specialist["cognitive_state"],
-            "confidence": specialist["confidence"],
-            "renderer": "DeterministicSpecialist",
-        }
+        return _apply_persona(
+            context=context,
+            response_text=str(specialist["response_text"]),
+            cognitive_state=str(specialist["cognitive_state"]),
+            confidence=float(specialist["confidence"]),
+            renderer="DeterministicSpecialist",
+        )
     response, state, confidence, _, _ = LocalOllamaCortex.synthesize_deterministic_response(
         user_text=context.user_text,
         intent=context.intent,
@@ -235,12 +242,13 @@ def render_response(*, context: Any, dependencies: dict[str, Any]) -> dict[str, 
         user_role=context.user_role,
         target_role=context.target_role,
     )
-    return {
-        "response_text": response,
-        "cognitive_state": state,
-        "confidence": confidence,
-        "renderer": "DeterministicResponseSynthesizer",
-    }
+    return _apply_persona(
+        context=context,
+        response_text=response,
+        cognitive_state=state,
+        confidence=confidence,
+        renderer="DeterministicResponseSynthesizer",
+    )
 
 
 def verify_response(*, context: Any, dependencies: dict[str, Any]) -> Any:
@@ -282,6 +290,49 @@ def create_artifact(*, context: Any, dependencies: dict[str, Any]) -> tuple[Any,
         milestones=milestones,
     )
     return (artifact,)
+
+
+def _apply_persona(
+    *,
+    context: Any,
+    response_text: str,
+    cognitive_state: str,
+    confidence: float,
+    renderer: str,
+) -> dict[str, Any]:
+    base_response = RenderedResponse(
+        content=response_text,
+        style=ResponseStyle.PROFESSIONAL,
+        tone=_response_tone(cognitive_state),
+        sections=[response_text],
+        metadata={"renderer": renderer},
+    )
+    persona = context.persona_renderer.render_with_persona(
+        base_response=base_response,
+        user_message=context.user_text,
+        context=f"{context.intent.value} {context.user_text}",
+        cognitive_state=cognitive_state,
+        evidence_available=context.grounded.has_corroborating_evidence,
+    )
+    return {
+        "response_text": persona.content,
+        "cognitive_state": cognitive_state,
+        "confidence": confidence,
+        "renderer": renderer,
+        "persona_renderer": "PersonaRenderer",
+        "persona": persona,
+    }
+
+
+def _response_tone(cognitive_state: str) -> ResponseTone:
+    state = cognitive_state.upper()
+    if "CONFIDENT" in state or "APPROVAL" in state:
+        return ResponseTone.CONFIDENT
+    if "CONCERN" in state or "CAUTIOUS" in state or "SKEPTICAL" in state:
+        return ResponseTone.CAUTIOUS
+    if "EMPATH" in state:
+        return ResponseTone.EMPATHETIC
+    return ResponseTone.NEUTRAL
 
 
 def _money_values(text: str) -> list[float]:

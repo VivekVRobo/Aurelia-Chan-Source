@@ -1,4 +1,4 @@
-"""Aurelia Cognitive OS V4 executable and persistent cognitive runtime."""
+"""Aurelia Cognitive OS V4 executable, persistent, character-aware runtime."""
 
 from __future__ import annotations
 
@@ -8,7 +8,9 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 from aurelia.artifacts.schemas import ExecutiveArtifact
-from aurelia.character.director import CharacterDirector
+from aurelia.character.affect_engine import AffectIntensity, Emotion
+from aurelia.character.expression_policy import ExpressionStyle
+from aurelia.character.persona_renderer import PersonaRenderedResponse, PersonaRenderer
 from aurelia.cognition.planner import CognitivePlanner
 from aurelia.cognition.router import CognitiveRouter
 from aurelia.contracts.core_types import UserGoal
@@ -33,12 +35,26 @@ class CognitiveExecutionError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class CharacterPresentation:
+    """Typed character state attached to one verified user-visible response."""
+
+    emotion: Emotion
+    emotion_intensity: AffectIntensity
+    expression_style: ExpressionStyle
+    mode: str
+    traits: tuple[str, ...]
+    expression: str
+    portrait_path: str
+
+
+@dataclass(frozen=True)
 class CognitiveCycleResponse:
     """Consolidated return object from a completed verified cognitive cycle."""
 
     response_text: str
     expression: str
     portrait_path: str
+    persona: CharacterPresentation
     confidence_percentage: float
     trace: SafeCognitiveTrace
     verification_report: VerificationReport
@@ -48,7 +64,7 @@ class CognitiveCycleResponse:
 
 
 class AureliaCognitiveRuntime:
-    """Compile, execute, verify, persist, and record one Aurelia interaction."""
+    """Compile, execute, characterize, verify, persist, and record one interaction."""
 
     def __init__(
         self,
@@ -61,6 +77,7 @@ class AureliaCognitiveRuntime:
         self.executor = TypedExecutor(self.registry)
         self.dag_executor = CognitiveDAGExecutor(self.registry)
         self.grounder = RuntimeGrounder()
+        self.persona_renderer = PersonaRenderer()
         self.database = database or CognitiveDatabase(db_path)
         self.persistence = RuntimePersistence(self.database)
         self.receipts: dict[str, DecisionReceipt] = {}
@@ -73,7 +90,7 @@ class AureliaCognitiveRuntime:
         chat_history: list[dict[str, str]] | None = None,
         memory_candidates: tuple[MemoryCandidate, ...] = (),
     ) -> CognitiveCycleResponse:
-        """Execute, verify, and atomically persist the compiled cognitive DAG."""
+        """Execute, characterize, verify, and atomically persist the cognitive DAG."""
         intent, entities = SemanticMeaningEngine.analyze(user_text)
         meaning = MeaningFrame(
             frame_id=f"mf_{uuid4().hex}",
@@ -122,6 +139,7 @@ class AureliaCognitiveRuntime:
             active_goal=goal,
             budget=budget,
             grounded=grounded,
+            persona_renderer=self.persona_renderer,
         )
         execution = self.dag_executor.execute(plan, context=runtime_context)
         if not execution.success:
@@ -132,11 +150,31 @@ class AureliaCognitiveRuntime:
         response_prose = str(rendered["response_text"])
         confidence = float(rendered.get("confidence", 0.0))
         cognitive_state = str(rendered.get("cognitive_state", "FOCUSED"))
+        persona_rendered = rendered.get("persona")
+        if not isinstance(persona_rendered, PersonaRenderedResponse):
+            raise CognitiveExecutionError(
+                "User-visible DAG output bypassed Aurelia PersonaRenderer."
+            )
 
         verification_key = "firewall" if "firewall" in execution.outputs else "verify_output"
         verification_report: VerificationReport = execution.outputs[verification_key]
         if not verification_report.is_safe_to_publish:
             raise CognitiveExecutionError("Verification firewall rejected the rendered response.")
+
+        expression, portrait_path = PersonaRenderer.resolve_expression(
+            emotion=persona_rendered.emotion,
+            cognitive_state=cognitive_state,
+            verification_severity=verification_report.max_severity,
+        )
+        presentation = CharacterPresentation(
+            emotion=persona_rendered.emotion,
+            emotion_intensity=persona_rendered.emotion_intensity,
+            expression_style=persona_rendered.expression_style,
+            mode=persona_rendered.mode,
+            traits=tuple(persona_rendered.traits),
+            expression=expression,
+            portrait_path=portrait_path,
+        )
 
         artifacts = tuple(execution.outputs.get("artifact_gen", ()))
         critics = execution.outputs.get("critics", {})
@@ -148,15 +186,6 @@ class AureliaCognitiveRuntime:
             for entry in evaluations
             for critique in entry["critiques"]
         }
-
-        expression = CharacterDirector.resolve_expression(
-            cognitive_state=cognitive_state,
-            verification_severity=verification_report.max_severity,
-        )
-        portrait_info = CharacterDirector.EXPRESSION_MAP.get(
-            expression,
-            ("01. Neutral", "01-neutral-observing.png"),
-        )
 
         unresolved_unknowns = tuple(
             issue.description
@@ -205,7 +234,8 @@ class AureliaCognitiveRuntime:
         return CognitiveCycleResponse(
             response_text=response_prose,
             expression=expression,
-            portrait_path=f"aurelia-expressions/{portrait_info[1]}",
+            portrait_path=portrait_path,
+            persona=presentation,
             confidence_percentage=confidence,
             trace=trace,
             verification_report=verification_report,

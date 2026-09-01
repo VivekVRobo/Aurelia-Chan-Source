@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from aurelia.character.persona_renderer import PersonaRenderer
 from aurelia.cognition.router import CognitiveBudget
 from aurelia.contracts.core_types import UserGoal
 from aurelia.contracts.meaning_frame import IntentType
@@ -29,6 +30,7 @@ class RuntimeExecutionContext:
     active_goal: UserGoal
     budget: CognitiveBudget
     grounded: GroundedContext
+    persona_renderer: PersonaRenderer
 
 
 class RuntimeCapabilityCatalog:

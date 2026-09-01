@@ -23,6 +23,7 @@ jobs:
       - name: Lint stabilized files
         run: |
           ruff check \
+            aurelia/character/persona_renderer.py \
             aurelia/cognition/planner.py \
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
@@ -37,9 +38,11 @@ jobs:
             aurelia/runtime/persistence.py \
             test_dag_execution.py \
             test_persistence_runtime.py \
+            test_persona_runtime.py \
             test_runtime_stabilization.py \
             test_v4_phase10_integration.py
           ruff format --check \
+            aurelia/character/persona_renderer.py \
             aurelia/cognition/planner.py \
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
@@ -54,6 +57,7 @@ jobs:
             aurelia/runtime/persistence.py \
             test_dag_execution.py \
             test_persistence_runtime.py \
+            test_persona_runtime.py \
             test_runtime_stabilization.py \
             test_v4_phase10_integration.py
       - name: Runtime stabilization regression tests
@@ -61,7 +65,8 @@ jobs:
           python -m unittest -v \
             test_runtime_stabilization \
             test_dag_execution \
-            test_persistence_runtime
+            test_persistence_runtime \
+            test_persona_runtime
 
   cognitive-os-v4-v6:
     runs-on: ubuntu-latest
