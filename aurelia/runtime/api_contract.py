@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from aurelia.embodiment.adapter import AureliaEmbodimentAdapter
+from aurelia.embodiment.contracts import SCHEMA_VERSION
 from aurelia.runtime.cognitive_runtime import CognitiveCycleResponse
 
 
@@ -11,8 +13,10 @@ def serialize_cognitive_cycle(result: CognitiveCycleResponse) -> dict[str, Any]:
     """Serialize one verified cognitive cycle without dropping runtime provenance.
 
     The top-level expression and portrait fields are retained for existing clients.
-    New clients should consume the typed ``persona`` and ``persistence`` blocks.
+    New clients should consume the typed ``persona``, ``persistence``, and
+    actuator-free ``character_response`` blocks.
     """
+    character_response = AureliaEmbodimentAdapter.adapt(result)
     return {
         "response": result.response_text,
         "expression": result.expression,
@@ -27,6 +31,7 @@ def serialize_cognitive_cycle(result: CognitiveCycleResponse) -> dict[str, Any]:
             "expression": result.persona.expression,
             "portrait": result.persona.portrait_path,
         },
+        "character_response": character_response.to_dict(),
         "trace": {
             "understood": result.trace.understood_goal,
             "memories_count": result.trace.memories_retrieved_count,
@@ -80,6 +85,7 @@ def serialize_runtime_status(result: dict[str, object]) -> dict[str, object]:
     return {
         "runtime_configured": True,
         "persona_renderer": True,
+        "embodiment_contract": SCHEMA_VERSION,
         "persistence": {
             "durable": bool(result["durable"]),
             "decision_receipts": int(result["decision_receipts"]),
