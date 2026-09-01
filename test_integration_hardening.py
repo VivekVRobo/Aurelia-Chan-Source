@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from aurelia.embodiment.contracts import SCHEMA_VERSION
 from aurelia.llm.ollama_cortex import LocalOllamaCortex
 from aurelia.runtime.app_bootstrap import configure_integrated_backend
 from aurelia.runtime.cognitive_runtime import CognitiveExecutionError
@@ -54,6 +55,16 @@ class TestIntegrationHardening(unittest.TestCase):
         self.assertTrue(data["persistence"]["durable"])
         self.assertTrue(data["decision_id"])
 
+        character = data["character_response"]
+        self.assertEqual(character["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(character["decision_id"], data["decision_id"])
+        self.assertEqual(character["speech"]["text"], data["response"])
+        self.assertEqual(character["expression"]["expression"], data["expression"])
+        self.assertTrue(character["verified"])
+        self.assertTrue(character["persistence_committed"])
+        self.assertTrue(character["persistence_durable"])
+        self.assertIn(character["motion"]["disposition"], {"none", "optional"})
+
     def test_runtime_status_reports_durable_character_aware_server(self) -> None:
         response = self.client.get("/api/runtime-status")
 
@@ -61,6 +72,7 @@ class TestIntegrationHardening(unittest.TestCase):
         data = response.get_json()
         self.assertTrue(data["runtime_configured"])
         self.assertTrue(data["persona_renderer"])
+        self.assertEqual(data["embodiment_contract"], SCHEMA_VERSION)
         self.assertTrue(data["persistence"]["durable"])
         self.assertEqual(data["registered_capabilities"], 12)
         self.assertNotIn("db_path", str(data))
