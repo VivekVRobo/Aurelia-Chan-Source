@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from datetime import UTC, datetime
@@ -14,6 +15,7 @@ from aurelia.contracts.receipt import DecisionReceipt
 from aurelia.llm.ollama_cortex import LocalOllamaCortex
 from aurelia.memory.write_policy import MemoryCandidate
 from aurelia.persistence.database import CognitiveDatabase, PersistenceError
+from aurelia.runtime.app_bootstrap import create_application_runtime, resolve_database_path
 from aurelia.runtime.cognitive_runtime import AureliaCognitiveRuntime
 from aurelia.runtime.persistence import RuntimePersistence
 
@@ -25,6 +27,8 @@ class TestRuntimePersistence(unittest.TestCase):
             db_path = str(Path(directory) / "aurelia.db")
             first_runtime = AureliaCognitiveRuntime(db_path=db_path)
             result = first_runtime.process_query("Give me general career guidance.")
+            self.assertTrue(result.persistence.committed)
+            self.assertTrue(result.persistence.durable)
             decision_id = result.decision_receipt.decision_id
             first_runtime.database.close()
 
@@ -61,6 +65,8 @@ class TestRuntimePersistence(unittest.TestCase):
             "Record this verified leadership scope.",
             memory_candidates=(candidate,),
         )
+        self.assertTrue(first.persistence.committed)
+        self.assertFalse(first.persistence.durable)
         self.assertEqual(first.persistence.approved_memory_ids, ("fact_scope_1",))
         self.assertEqual(runtime.database.count_rows("canonical_facts"), 1)
 
@@ -180,6 +186,23 @@ class TestRuntimePersistence(unittest.TestCase):
             persistence.commit_verified_cycle(receipt=receipt, artifacts=())
 
         self.assertEqual(database.count_rows("decision_receipts"), 0)
+
+    def test_application_runtime_defaults_to_file_backed_workspace_database(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            runtime = create_application_runtime(workspace)
+            expected = (workspace / "data" / "aurelia.db").resolve()
+            self.assertEqual(Path(runtime.database.db_path), expected)
+            diagnostics = runtime.persistence.diagnostics()
+            self.assertTrue(diagnostics["durable"])
+            runtime.database.close()
+
+    def test_database_path_environment_override_can_be_relative_to_workspace(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            with patch.dict(os.environ, {"AURELIA_DB_PATH": "state/custom.db"}):
+                resolved = resolve_database_path(workspace)
+            self.assertEqual(resolved, (workspace / "state" / "custom.db").resolve())
 
 
 def _receipt(
