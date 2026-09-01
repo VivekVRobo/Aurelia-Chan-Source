@@ -1,0 +1,8 @@
+{
+  "name": "aurelia-frontend-validation",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test:frontend": "node --test tests/frontend/*.test.cjs"
+  }
+}
