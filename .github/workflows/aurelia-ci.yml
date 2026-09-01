@@ -23,12 +23,14 @@ jobs:
       - name: Lint stabilized files
         run: |
           ruff check \
+            aurelia/execution/executor.py \
             aurelia/runtime/cognitive_runtime.py \
             aurelia/runtime/grounding.py \
             aurelia/runtime/health.py \
             test_runtime_stabilization.py \
             test_v4_phase10_integration.py
           ruff format --check \
+            aurelia/execution/executor.py \
             aurelia/runtime/cognitive_runtime.py \
             aurelia/runtime/grounding.py \
             aurelia/runtime/health.py \
@@ -61,20 +63,20 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
+          pip install -e '.[dev]'
       - name: Run original phase suites
         run: |
-          python -m unittest -v \
-            test_phase1_contracts \
-            test_phase2_knowledge \
-            test_phase2_specialists \
-            test_phase3_routing \
-            test_phase4_memory \
-            test_phase5_planning \
-            test_phase6_verification \
-            test_phase7_llm \
-            test_phase8_character \
-            test_phase9_higher_cognition \
-            test_phase10_learning \
-            test_phase11_evaluation \
-            test_phase12_runtime
+          pytest -q \
+            test_phase1_contracts.py \
+            test_phase2_knowledge.py \
+            test_phase2_specialists.py \
+            test_phase3_routing.py \
+            test_phase4_memory.py \
+            test_phase5_planning.py \
+            test_phase6_verification.py \
+            test_phase7_llm.py \
+            test_phase8_character.py \
+            test_phase9_higher_cognition.py \
+            test_phase10_learning.py \
+            test_phase11_evaluation.py \
+            test_phase12_runtime.py
