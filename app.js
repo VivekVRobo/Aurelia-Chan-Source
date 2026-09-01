@@ -1,4 +1,4 @@
-/* Aurelia-chan Executive Mentor Application - Core & Integrated Engine */
+/* Aurelia-chan Executive Mentor Application - Integrated Cognitive Engine */
 
 // Global voice synthesis handler accessible everywhere immediately
 window.speakMessage = function(text) {
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {
           title: "Escenario 01: Negociación Salarial",
           prompt: "La oferta es un 15% inferior a tu objetivo de mercado. ¿Cómo respondes estratégicamente?",
-          sampleResponse: "Demuestro mi entusiasmo por la position, destaco mi impacto probado y propongo una revisión basada en metas a 6 meses."
+          sampleResponse: "Demuestro mi entusiasmo por la posición, destaco mi impacto probado y propongo una revisión basada en metas a 6 meses."
         }
       ]
     }
@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- Chat Submission Handler with V4 Cognitive Cycle & Safe Trace ---
+  // --- Chat Submission Handler ---
   chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const userText = chatInput.value.trim();
@@ -755,6 +755,24 @@ document.addEventListener('DOMContentLoaded', () => {
     setExpression('neutral');
   });
 
+  // --- Populate Canon Inspector 15 Master Sheets ---
+  function populateMasterSheets() {
+    masterSheetsGrid.innerHTML = '';
+    masterSheetFiles.forEach(file => {
+      const card = document.createElement('div');
+      card.className = 'sheet-thumb-card';
+      const nameWithoutExt = file.replace('.png', '');
+      card.innerHTML = `
+        <img src="aurelia-canon/master-sheets/${file}" alt="${nameWithoutExt}" loading="lazy">
+        <p title="${file}">${nameWithoutExt}</p>
+      `;
+      card.addEventListener('click', () => {
+        window.open(`aurelia-canon/master-sheets/${file}`, '_blank');
+      });
+      masterSheetsGrid.appendChild(card);
+    });
+  }
+
   // --- V5 Adaptive Forecast Refresh Handler ---
   const v5RefreshBtn = document.getElementById('v5RefreshForecastBtn');
   if (v5RefreshBtn) {
@@ -780,24 +798,6 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         v5RefreshBtn.textContent = '🔄 Recalculate Forecast';
       }
-    });
-  }
-
-  // --- Populate Canon Inspector 15 Master Sheets ---
-  function populateMasterSheets() {
-    masterSheetsGrid.innerHTML = '';
-    masterSheetFiles.forEach(file => {
-      const card = document.createElement('div');
-      card.className = 'sheet-thumb-card';
-      const nameWithoutExt = file.replace('.png', '');
-      card.innerHTML = `
-        <img src="aurelia-canon/master-sheets/${file}" alt="${nameWithoutExt}" loading="lazy">
-        <p title="${file}">${nameWithoutExt}</p>
-      `;
-      card.addEventListener('click', () => {
-        window.open(`aurelia-canon/master-sheets/${file}`, '_blank');
-      });
-      masterSheetsGrid.appendChild(card);
     });
   }
 
