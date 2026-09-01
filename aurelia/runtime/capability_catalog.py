@@ -12,6 +12,7 @@ from aurelia.contracts.snapshot import CognitiveSnapshot
 from aurelia.execution.capability import Capability, CapabilityPermission, ExecutionMode
 from aurelia.execution.registry import CapabilityRegistry
 from aurelia.runtime import capability_handlers
+from aurelia.runtime.dag_verification import verify_rendered_response
 from aurelia.runtime.grounding import GroundedContext
 
 
@@ -46,7 +47,7 @@ class RuntimeCapabilityCatalog:
             ("cognition.critics.evaluate", capability_handlers.evaluate_critics),
             ("specialist.evaluate", capability_handlers.evaluate_specialist),
             ("response.render.aurelia", capability_handlers.render_response),
-            ("verification.firewall.verify", capability_handlers.verify_response),
+            ("verification.firewall.verify", verify_rendered_response),
             ("artifact.workspace.create", capability_handlers.create_artifact),
         )
         hybrid_ids = {"response.render.aurelia"}
