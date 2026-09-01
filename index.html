@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurelia-chan — Executive Career Mentor & Life Strategist</title>
+  <meta name="description" content="Interactive AI Executive Mentor interface featuring Aurelia-chan with dynamic expressions and free custom voice synthesis.">
+  <link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="brand">
+      <div class="brand-logo-icon">A</div>
+      <div class="brand-text">
+        <h1>Aurelia-chan</h1>
+        <span>Executive Career Mentor</span>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <!-- Multi-Language Selector -->
+      <div class="lang-selector-group">
+        <label for="languageSelect">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Lang:
+        </label>
+        <select id="languageSelect" class="lang-select">
+          <option value="en-US" selected>English (US)</option>
+          <option value="ja-JP">日本語 (Japanese)</option>
+          <option value="de-DE">Deutsch (German)</option>
+          <option value="fr-FR">Français (French)</option>
+          <option value="es-ES">Español (Spanish)</option>
+        </select>
+      </div>
+
+      <!-- Free Custom Voice Toggle -->
+      <button id="voiceToggleBtn" class="voice-toggle-btn active" title="Toggle Aurelia's Custom Voice Synthesis">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        <span>Voice: ON</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- App Main Content Layout -->
+  <main class="app-layout">
+    
+    <!-- Left Column: Character Stage -->
+    <section class="character-stage-card">
+      <div class="stage-badge">
+        <div class="status-dot"></div>
+        <span>Canon v1.0 Locked</span>
+      </div>
+
+      <!-- Expression Portrait Stack -->
+      <div class="avatar-container" id="avatarContainer">
+        <img src="aurelia-expressions/01-neutral-observing.png" alt="Aurelia-chan Neutral" class="avatar-img active" data-expression="neutral">
+        <img src="aurelia-expressions/02-subtle-confident-smile.png" alt="Aurelia-chan Confident Smile" class="avatar-img" data-expression="confident">
+        <img src="aurelia-expressions/03-soft-approval.png" alt="Aurelia-chan Soft Approval" class="avatar-img" data-expression="approval">
+        <img src="aurelia-expressions/04-focused-listening.png" alt="Aurelia-chan Focused Listening" class="avatar-img" data-expression="focused">
+        <img src="aurelia-expressions/05-analyzing-raised-brow.png" alt="Aurelia-chan Analyzing" class="avatar-img" data-expression="analyzing">
+        <img src="aurelia-expressions/06-serious.png" alt="Aurelia-chan Serious" class="avatar-img" data-expression="serious">
+        <img src="aurelia-expressions/07-strict-warning.png" alt="Aurelia-chan Warning" class="avatar-img" data-expression="warning">
+        <img src="aurelia-expressions/08-disappointed.png" alt="Aurelia-chan Disappointed" class="avatar-img" data-expression="disappointed">
+        <img src="aurelia-expressions/09-skeptical.png" alt="Aurelia-chan Skeptical" class="avatar-img" data-expression="skeptical">
+        <img src="aurelia-expressions/10-concerned.png" alt="Aurelia-chan Concerned" class="avatar-img" data-expression="concerned">
+        <img src="aurelia-expressions/11-empathetic.png" alt="Aurelia-chan Empathetic" class="avatar-img" data-expression="empathetic">
+      </div>
+
+      <!-- Expression Info Display -->
+      <div class="expression-info">
+        <h2 id="expTitle" class="expression-title">01. Neutral / Observing</h2>
+        <p id="expSubtitle" class="expression-subtitle">Calm executive evaluation and structured focus.</p>
+      </div>
+
+      <!-- Audio Visualizer Canvas -->
+      <div class="audio-visualizer-box">
+        <canvas id="visualizerCanvas" class="visualizer-canvas"></canvas>
+        <div class="visualizer-status" id="visualizerStatus">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5v14M7 9v6M22 11v2M2 11v2"/></svg>
+          <span id="voiceStatusText">Neural Voice Engine Ready</span>
+        </div>
+      </div>
+
+      <!-- Expression Palette Quick Selector -->
+      <div class="expression-grid" id="expressionGrid">
+        <button class="exp-btn active" data-exp="neutral">Neutral</button>
+        <button class="exp-btn" data-exp="confident">Confident</button>
+        <button class="exp-btn" data-exp="approval">Approval</button>
+        <button class="exp-btn" data-exp="focused">Focused</button>
+        <button class="exp-btn" data-exp="analyzing">Analyzing</button>
+        <button class="exp-btn" data-exp="serious">Serious</button>
+        <button class="exp-btn" data-exp="warning">Warning</button>
+        <button class="exp-btn" data-exp="disappointed">Disappointed</button>
+        <button class="exp-btn" data-exp="skeptical">Skeptical</button>
+        <button class="exp-btn" data-exp="concerned">Concerned</button>
+        <button class="exp-btn" data-exp="empathetic">Empathetic</button>
+      </div>
+    </section>
+
+    <!-- Right Column: Interactive Modules -->
+    <section class="main-stage-card">
+      
+      <!-- Module Navigation Tabs -->
+      <nav class="module-tabs">
+        <button class="tab-btn active" data-tab="chatTab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Mentor Chat
+        </button>
+        <button class="tab-btn" data-tab="resumeTab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Resume Audit
+        </button>
+        <button class="tab-btn" data-tab="interviewTab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Interview Sim
+        </button>
+        <button class="tab-btn" data-tab="v5AdaptiveTab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          V5 Adaptive Hub
+        </button>
+        <button class="tab-btn" data-tab="v6PerceptionTab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          V6 Perception Hub
+        </button>
+        <button class="tab-btn" data-tab="canonTab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          Canon Spec
+        </button>
+      </nav>
+
+      <!-- TAB 1: Mentor Chat -->
+      <div id="chatTab" class="tab-content active">
+        <div class="chat-container">
+          <div class="chat-history" id="chatHistory">
+            <!-- Initial Welcome Message -->
+            <div class="chat-bubble aurelia">
+              <div class="speaker-header">
+                <span>Aurelia-chan — Executive Mentor</span>
+                <button class="speak-icon-btn" onclick="speakMessage('Good day. I am Aurelia, your executive career mentor. How may I assist your professional trajectory today?')">
+                  🔊
+                </button>
+              </div>
+              Good day. I am Aurelia, your executive career mentor. How may I assist your professional trajectory today? We can discuss career strategy, promotion planning, or workplace challenges.
+            </div>
+          </div>
+
+          <form id="chatForm" class="chat-input-area">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Ask Aurelia about career strategy, leadership, or challenges..." autocomplete="off">
+            <button type="submit" class="btn-primary" id="chatSubmitBtn">
+              <span class="btn-text">Send</span>
+              <span class="btn-loading" style="display: none;">Processing...</span>
+              <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 2: Resume Audit -->
+      <div id="resumeTab" class="tab-content">
+        <div class="audit-container">
+          <div class="form-group">
+            <label for="resumeText">Paste Resume / CV / LinkedIn Summary for Executive Audit</label>
+            <textarea id="resumeText" class="textarea-input" placeholder="Paste your executive summary, experience bullet points, or skills list here..."></textarea>
+          </div>
+
+          <button id="auditBtn" class="btn-primary">
+            <span class="btn-text">Run Executive Audit</span>
+            <span class="btn-loading" style="display: none;">Analyzing...</span>
+            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </button>
+
+          <!-- Audit Result Display -->
+          <div id="auditResultCard" class="audit-result-card">
+            <div class="score-badge-row">
+              <div>
+                <h3 style="color: var(--warm-ivory); font-family: 'Cinzel', serif;">Executive Alignment Score</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Evaluated on clarity, impact metrics, and leadership tone.</p>
+              </div>
+              <div class="score-circle" id="auditScore">88%</div>
+            </div>
+
+            <div class="audit-section">
+              <h4>Key Strengths</h4>
+              <ul id="auditStrengths"></ul>
+            </div>
+
+            <div class="audit-section">
+              <h4>Strategic Improvements Required</h4>
+              <ul id="auditImprovements"></ul>
+            </div>
+
+            <div class="audit-section">
+              <h4>Aurelia's Executive Recommendation</h4>
+              <p id="auditRecommendation"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Interview Simulator -->
+      <div id="interviewTab" class="tab-content">
+        <div class="interview-container">
+          <div class="scenario-card">
+            <h3 id="scenarioTitle">Executive Scenario 01: Salary Negotiation</h3>
+            <p id="scenarioPrompt">"The hiring manager offers a package 15% below your market target, citing current fiscal constraints. How do you respond without jeopardizing the offer?"</p>
+          </div>
+
+          <div class="form-group">
+            <label for="interviewResponse">Your Strategic Response</label>
+            <textarea id="interviewResponse" class="textarea-input" placeholder="Type your response using clear STAR method structure or professional framing..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 1rem;">
+            <button id="evaluateAnswerBtn" class="btn-primary" style="flex: 1;">
+              <span class="btn-text">Submit Answer for Evaluation</span>
+              <span class="btn-loading" style="display: none;">Evaluating...</span>
+            </button>
+            <button id="nextScenarioBtn" class="btn-primary" style="background: var(--charcoal); color: var(--warm-ivory); border: 1px solid var(--border-subtle);">
+              Next Scenario
+            </button>
+          </div>
+
+          <div id="interviewFeedbackCard" class="audit-result-card">
+            <div class="score-badge-row">
+              <h3 style="color: var(--warm-ivory); font-family: 'Cinzel', serif;">Interview Feedback</h3>
+              <div class="score-circle" id="interviewScore">92</div>
+            </div>
+            <p id="interviewFeedbackText" style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: V5 Adaptive Intelligence Hub -->
+      <div id="v5AdaptiveTab" class="tab-content">
+        <div class="v5-hub-container">
+          <div class="v5-hub-header">
+            <h3>Aurelia Cognitive OS V5 — Adaptive Intelligence Hub</h3>
+            <p>Lifelong Learning, Probabilistic Goal Forecasting & Proactive Autonomy Engine.</p>
+          </div>
+
+          <div class="v5-grid-layout">
+            <!-- Card 1: Goal Forecast & Critical Path -->
+            <div class="v5-card">
+              <div class="v5-card-header">
+                <h4>🎯 Live Goal Forecast & Critical Path</h4>
+                <span class="v5-badge on-track" id="v5GoalBadge">ON_TRACK (82%)</span>
+              </div>
+              <div class="v5-card-body">
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Target Role:</span>
+                  <strong id="v5TargetRole">Director of Engineering</strong>
+                </div>
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Projected Window:</span>
+                  <span id="v5ProjectedWindow">6.8 – 10.0 Months</span>
+                </div>
+                <div class="v5-metric-row bottleneck">
+                  <span class="v5-lbl">Critical Path Bottleneck:</span>
+                  <strong id="v5Bottleneck">Budget Ownership ($5M+)</strong>
+                </div>
+                <div class="v5-blockers-list" id="v5BlockersList">
+                  <li>Active: Accelerating in Executive Communication (+0.28/mo)</li>
+                  <li>Prerequisite needed: Formal $5M+ P&L allocation review</li>
+                </div>
+                <button class="v5-action-btn" id="v5RefreshForecastBtn">🔄 Recalculate Forecast</button>
+              </div>
+            </div>
+
+            <!-- Card 2: Longitudinal Competency Velocity -->
+            <div class="v5-card">
+              <div class="v5-card-header">
+                <h4>📈 Longitudinal Competency Velocity</h4>
+                <span class="v5-badge nominal">Steady Progress</span>
+              </div>
+              <div class="v5-card-body">
+                <div class="v5-velocity-item">
+                  <div class="v5-vel-header">
+                    <span>Executive Communication</span>
+                    <strong>3.4 / 4.0 (+0.28/mo)</strong>
+                  </div>
+                  <div class="v5-progress-bar"><div class="v5-progress-fill" style="width: 85%;"></div></div>
+                </div>
+                <div class="v5-velocity-item">
+                  <div class="v5-vel-header">
+                    <span>Budget & Financial Governance</span>
+                    <strong>2.2 / 4.0 (+0.15/mo)</strong>
+                  </div>
+                  <div class="v5-progress-bar"><div class="v5-progress-fill" style="width: 55%;"></div></div>
+                </div>
+                <div class="v5-velocity-item">
+                  <div class="v5-vel-header">
+                    <span>Organizational Influence</span>
+                    <strong>3.4 / 4.0 (+0.20/mo)</strong>
+                  </div>
+                  <div class="v5-progress-bar"><div class="v5-progress-fill" style="width: 85%;"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Intelligence Health & Calibration Scorecard -->
+            <div class="v5-card">
+              <div class="v5-card-header">
+                <h4>🛡️ Intelligence Health & Calibration</h4>
+                <span class="v5-badge healthy">HEALTHY</span>
+              </div>
+              <div class="v5-card-body">
+                <div class="v5-metric-grid">
+                  <div class="v5-metric-box">
+                    <span class="v5-box-val">100%</span>
+                    <span class="v5-box-lbl">Numerical Verification</span>
+                  </div>
+                  <div class="v5-metric-box">
+                    <span class="v5-box-val">98.1%</span>
+                    <span class="v5-box-lbl">Memory Precision</span>
+                  </div>
+                  <div class="v5-metric-box">
+                    <span class="v5-box-val">4.2%</span>
+                    <span class="v5-box-lbl">Calibration Error</span>
+                  </div>
+                  <div class="v5-metric-box">
+                    <span class="v5-box-val">0.0%</span>
+                    <span class="v5-box-lbl">Unsupported Claims</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Proactive Intelligence Feed -->
+            <div class="v5-card">
+              <div class="v5-card-header">
+                <h4>⚡ Proactive Strategic Feed</h4>
+                <span class="v5-badge nominal">Reason to Interrupt</span>
+              </div>
+              <div class="v5-card-body">
+                <div class="v5-proactive-feed" id="v5ProactiveFeed">
+                  <div class="v5-feed-item">
+                    <strong>🔔 Proactive Strategy Update:</strong>
+                    <p>Your Director timeline was updated because recent mock interview data increased your Executive Communication score, shifting Budget Ownership to the critical path bottleneck.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: V6 Perception & Situational Intelligence Hub -->
+      <div id="v6PerceptionTab" class="tab-content">
+        <div class="v5-hub-container">
+          <div class="v5-hub-header">
+            <h3>Aurelia Cognitive OS V6 — Multimodal Perception & Situational Intelligence Hub</h3>
+            <p>Grounded Environmental Awareness, Accessibility Scene Graph & Pre-Capture Privacy Firewall.</p>
+          </div>
+
+          <!-- Live Privacy & Active Modality Badges -->
+          <div class="v6-privacy-bar">
+            <div class="v6-badge-group">
+              <span class="v6-status-pill active" id="v6ScreenBadge">👁 Screen Context Active</span>
+              <span class="v6-status-pill active" id="v6AudioBadge">🎤 Speech Session Active</span>
+              <span class="v6-status-pill active" id="v6DocBadge">📄 Document Intelligence Active</span>
+              <span class="v6-status-pill shield">🛡️ Pre-Capture Privacy Firewall Active</span>
+            </div>
+            <div class="v6-ctrl-btns">
+              <button class="v6-btn-pause" id="v6PausePerceptionBtn">⏸ Pause Perception</button>
+              <button class="v6-btn-clear" id="v6ClearSessionBtn">🗑 Clear Working Memory</button>
+            </div>
+          </div>
+
+          <div class="v5-grid-layout">
+            <!-- Card 1: Live Scene Graph & Active Application -->
+            <div class="v5-card">
+              <div class="v5-card-header">
+                <h4>🖥️ Live UI Scene Graph & Active Scene</h4>
+                <span class="v5-badge healthy" id="v6AppBadge">VS CODE (Tier 1 Accessibility)</span>
+              </div>
+              <div class="v5-card-body">
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Active Window:</span>
+                  <strong id="v6WinTitle">Aurelia-Chan - Visual Studio Code</strong>
+                </div>
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Perception Tier:</span>
+                  <span id="v6PerceptionTier">Tier 1: Accessibility Tree (0 Vision Tokens)</span>
+                </div>
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Active Control:</span>
+                  <strong>CodeEditor (cognitive_runtime.py)</strong>
+                </div>
+                <div class="v5-blockers-list" id="v6SceneEntities">
+                  <li>Active: Python Traceback / Syntax Buffer visible in Editor</li>
+                  <li>Context: vscode_python_debugging (Confidence: 0.92, Separation: 0.51)</li>
+                </div>
+                <button class="v5-action-btn" id="v6ScanSceneBtn">🔍 Re-Scan Environment Scene</button>
+              </div>
+            </div>
+
+            <!-- Card 2: Multimodal Entity & Pronoun Grounding -->
+            <div class="v5-card">
+              <div class="v5-card-header">
+                <h4>🔗 Multimodal Grounding & Entity Resolution</h4>
+                <span class="v5-badge nominal">Grounded (No Filename Needed)</span>
+              </div>
+              <div class="v5-card-body">
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">"this" Reference:</span>
+                  <strong id="v6GroundThis">Startup_Offer_A.pdf ($240k)</strong>
+                </div>
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">"other offer" Reference:</span>
+                  <span id="v6GroundOther">FAANG_Offer_B.pdf ($280k)</span>
+                </div>
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Source Dependence:</span>
+                  <span>1 Root Source (Non-compounded)</span>
+                </div>
+                <div class="v5-blockers-list">
+                  <li>Deictic pronouns safely grounded to physical file nodes</li>
+                  <li>Source Dependence DAG active: OCR + Vision share 1 root lineage</li>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Cross-Document Contradiction Engine -->
+            <div class="v5-card">
+              <div class="v5-card-header">
+                <h4>⚖️ Cross-Document Contradiction Engine</h4>
+                <span class="v5-badge healthy">CRITICAL Severity Checked</span>
+              </div>
+              <div class="v5-card-body">
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Temporal Conflict Check:</span>
+                  <strong style="color: #4ade80;">Calibrated (No silent override)</strong>
+                </div>
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Resume vs Performance Review:</span>
+                  <span>Verified (Minor P&L divergence flagged)</span>
+                </div>
+                <div class="v5-metric-row">
+                  <span class="v5-lbl">Compensation Divergence:</span>
+                  <span>MATERIAL Severity Gate ($240k vs $280k)</span>
+                </div>
+                <div class="v5-blockers-list">
+                  <li>Rule: Contradictions prompt clarification rather than silent decision</li>
+                  <li>Perception produces Evidence; World Model produces Truth</li>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Pre-Capture Privacy & Data Minimization -->
+            <div class="v5-card">
+              <div class="v5-card-header">
+                <h4>🛡️ Pre-Capture Privacy Firewall</h4>
+                <span class="v5-badge healthy">PRE-CAPTURE ENFORCED</span>
+              </div>
+              <div class="v5-card-body">
+                <div class="v5-metric-grid">
+                  <div class="v5-metric-box">
+                    <span class="v5-box-val">0</span>
+                    <span class="v5-box-lbl">Denied Screen Snaps</span>
+                  </div>
+                  <div class="v5-metric-box">
+                    <span class="v5-box-val">0 B</span>
+                    <span class="v5-box-lbl">Raw Retained Bytes</span>
+                  </div>
+                  <div class="v5-metric-box">
+                    <span class="v5-box-val">6</span>
+                    <span class="v5-box-lbl">Blocked Auth Apps</span>
+                  </div>
+                  <div class="v5-metric-box">
+                    <span class="v5-box-val">100%</span>
+                    <span class="v5-box-lbl">Purpose Binding</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: Canon Specification -->
+      <div id="canonTab" class="tab-content">
+        <div class="canon-inspector">
+          
+          <div class="canon-header">
+            <h3>Immutable Palette Swatches</h3>
+            <p>Canonical color definitions locked under Version 1.0 Specification.</p>
+          </div>
+
+          <div class="palette-grid">
+            <div class="color-card">
+              <div class="swatch" style="background: #0E0E12;"></div>
+              <span class="color-name">Jet Black</span>
+              <span class="color-code">#0E0E12</span>
+            </div>
+            <div class="color-card">
+              <div class="swatch" style="background: #1D1D22;"></div>
+              <span class="color-name">Charcoal</span>
+              <span class="color-code">#1D1D22</span>
+            </div>
+            <div class="color-card">
+              <div class="swatch" style="background: #F6EDE6;"></div>
+              <span class="color-name">Warm Ivory</span>
+              <span class="color-code">#F6EDE6</span>
+            </div>
+            <div class="color-card">
+              <div class="swatch" style="background: #1E3A8A;"></div>
+              <span class="color-name">Sapphire Mid</span>
+              <span class="color-code">#1E3A8A</span>
+            </div>
+            <div class="color-card">
+              <div class="swatch" style="background: #5A3FA0;"></div>
+              <span class="color-name">Royal Violet</span>
+              <span class="color-code">#5A3FA0</span>
+            </div>
+            <div class="color-card">
+              <div class="swatch" style="background: #C9A227;"></div>
+              <span class="color-name">Antique Gold</span>
+              <span class="color-code">#C9A227</span>
+            </div>
+          </div>
+
+          <div class="canon-header" style="margin-top: 1rem;">
+            <h3>Master Canon Sheets (15 Reference Blueprints)</h3>
+            <p>Official master sheets in <code>aurelia-canon/master-sheets/</code>.</p>
+          </div>
+
+          <div class="master-sheets-grid" id="masterSheetsGrid">
+            <!-- Dynamically populated by JS -->
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Aurelia-chan Project Canon v1.0 — <span>Immutable Master Authority</span> — Executive Mentor Engine</p>
+  </footer>
+
+  <script src="app_integrated.js?v=5"></script>
+</body>
+</html>

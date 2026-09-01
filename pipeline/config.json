@@ -1,0 +1,177 @@
+{
+  "project_name": "Aurelia 3D AI-Assisted Production Pipeline",
+  "version": "0.1.0",
+
+  "paths": {
+    "master_sheets": "aurelia-canon/master-sheets",
+    "reference_images": "pipeline/reference-images",
+    "raw_assets": "assets/raw",
+    "approved_assets": "assets/approved",
+    "web_assets": "assets/web",
+    "viewer": "viewer"
+  },
+
+  "provider": {
+    "active": "meshy",
+    "meshy": {
+      "api_key": "",
+      "api_base": "https://api.meshy.ai",
+      "model_version": "latest",
+      "topology": "smart",
+      "texture": true,
+      "auto_rig": true
+    },
+    "tripo": {
+      "api_key": "",
+      "api_base": "https://api.tripo3d.ai/v3",
+      "model_version": "latest",
+      "texture_quality": "hd"
+    }
+  },
+
+  "canon": {
+    "character_name": "Aurelia-chan",
+    "age": 33,
+    "height_cm": 170.0,
+    "proportion_system": 7.5,
+
+    "measurements_cm": {
+      "head_total": 20.6,
+      "neck": 9.0,
+      "shoulder_width": 38.0,
+      "bust": 87.0,
+      "underbust": 74.0,
+      "waist": 63.0,
+      "hips": 92.0,
+      "arm_length": 57.0,
+      "leg_length": 101.0,
+      "inseam": 79.0,
+      "foot_length": 24.5
+    },
+
+    "tolerances_cm": {
+      "height": 1.0,
+      "head_total": 1.0,
+      "shoulder_width": 2.0,
+      "bust": 3.0,
+      "underbust": 3.0,
+      "waist": 2.0,
+      "hips": 3.0,
+      "arm_length": 2.0,
+      "leg_length": 3.0,
+      "inseam": 3.0,
+      "foot_length": 1.0
+    },
+
+    "colors": {
+      "skin_base": "#F6EDE6",
+      "skin_shadow": "#EBDCCA",
+      "skin_mid": "#F1E3D6",
+      "skin_warmth": "#F6DCC8",
+      "skin_highlight": "#FFF6F0",
+
+      "hair_base": "#0E0E12",
+      "hair_mid": "#1A1A21",
+      "hair_highlight": "#2A2A33",
+      "hair_rim": "#3B3B47",
+      "hair_specular": "#4A4A57",
+
+      "eye_outer_ring": "#0E1624",
+      "eye_mid_iris": "#1E3A8A",
+      "eye_main_iris": "#2F5FB3",
+      "eye_inner_ring": "#5A3FA0",
+      "eye_highlight": "#E6F1FF",
+
+      "blazer": "#0E0E12",
+      "shirt": "#F7F7F7",
+      "trousers": "#0E0E12",
+      "belt": "#1D1D22",
+      "heels": "#0A0A0A",
+      "gold_accent": "#C9A227",
+      "watch_face": "#0E0E12",
+
+      "charcoal": "#1D1D22",
+      "slate_gray": "#8B8F98"
+    }
+  },
+
+  "materials": {
+    "skin": {
+      "base_color": "#F6EDE6",
+      "roughness": 0.4,
+      "metallic": 0.0,
+      "subsurface": 0.15,
+      "subsurface_color": "#F6DCC8"
+    },
+    "hair": {
+      "base_color": "#0E0E12",
+      "roughness": 0.35,
+      "metallic": 0.0,
+      "specular": 0.8
+    },
+    "blazer": {
+      "base_color": "#0E0E12",
+      "roughness": 0.7,
+      "metallic": 0.0
+    },
+    "shirt": {
+      "base_color": "#F7F7F7",
+      "roughness": 0.5,
+      "metallic": 0.0,
+      "sheen": 0.3
+    },
+    "trousers": {
+      "base_color": "#0E0E12",
+      "roughness": 0.65,
+      "metallic": 0.0
+    },
+    "belt": {
+      "base_color": "#1D1D22",
+      "roughness": 0.4,
+      "metallic": 0.0
+    },
+    "heels": {
+      "base_color": "#0A0A0A",
+      "roughness": 0.15,
+      "metallic": 0.0
+    },
+    "gold": {
+      "base_color": "#C9A227",
+      "roughness": 0.3,
+      "metallic": 1.0
+    },
+    "watch_face": {
+      "base_color": "#0E0E12",
+      "roughness": 0.1,
+      "metallic": 0.5
+    },
+    "eye_iris": {
+      "base_color": "#2F5FB3",
+      "roughness": 0.1,
+      "metallic": 0.0
+    }
+  },
+
+  "optimization": {
+    "desktop": {
+      "max_polygons": 80000,
+      "max_texture_resolution": 2048,
+      "max_glb_size_mb": 8,
+      "max_draw_calls": 15,
+      "max_materials": 15
+    },
+    "mobile": {
+      "max_polygons": 40000,
+      "max_texture_resolution": 1024,
+      "max_glb_size_mb": 4,
+      "max_draw_calls": 10,
+      "max_materials": 12
+    }
+  },
+
+  "blender": {
+    "executable": "blender",
+    "scene_unit": "METERS",
+    "scene_scale": 0.01
+  }
+}

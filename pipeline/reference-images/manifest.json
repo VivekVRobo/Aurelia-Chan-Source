@@ -1,0 +1,32 @@
+{
+  "prepared_at": "1786541876.4506147",
+  "target_size": [
+    1024,
+    1024
+  ],
+  "references": {
+    "front": "C:\\Users\\vivek\\Desktop\\Aurelia-Chan\\pipeline\\reference-images\\front.png",
+    "side": "C:\\Users\\vivek\\Desktop\\Aurelia-Chan\\pipeline\\reference-images\\side.png",
+    "back": "C:\\Users\\vivek\\Desktop\\Aurelia-Chan\\pipeline\\reference-images\\back.png",
+    "three_quarter": "C:\\Users\\vivek\\Desktop\\Aurelia-Chan\\pipeline\\reference-images\\three_quarter.png",
+    "face_front": "C:\\Users\\vivek\\Desktop\\Aurelia-Chan\\pipeline\\reference-images\\face_front.png",
+    "full_body_front": "C:\\Users\\vivek\\Desktop\\Aurelia-Chan\\pipeline\\reference-images\\full_body_front.png"
+  },
+  "source_sheets": [
+    "Aurelia-Chan backside look sheet.png",
+    "Aurelia-Chan blueprint backview look sheet.png",
+    "Aurelia-Chan blueprint sheet.png",
+    "Aurelia-Chan blueprint side look sheet.png",
+    "Aurelia-Chan eye look sheet.png",
+    "Aurelia-Chan full body blueprint.png",
+    "Aurelia-Chan hair sheet.png",
+    "Aurelia-Chan height reference blueprint sheet.png",
+    "Aurelia-Chan left side look sheet.png",
+    "Aurelia-Chan Master body blueprint sheet.png",
+    "Aurelia-Chan Master Canon Sheet.png",
+    "Aurelia-Chan outfit sheet.png",
+    "Aurelia-Chan right side look sheet.png",
+    "Aurelia-Chan side look sheet.png",
+    "Aurelia-Chan skin sheet.png"
+  ]
+}

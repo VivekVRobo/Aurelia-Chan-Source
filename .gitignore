@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Unit test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs & temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Heavy training data, raw generated media & duplicate drafts
+aurelia-expressions/home/
+aurelia-canon/pre-final-generated-portraits/
+assets/raw/
+assets/approved/
+assets/web/
+audio_pack/
+*.mp3
+*.wav
+*.mp4
+*.glb
+*.gltf
+*.bin
+*.pt
+*.pth
+*.safetensors
+*.ckpt
+
+# Archives
+*.zip
+*.tar.gz

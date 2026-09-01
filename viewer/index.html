@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurelia-chan — 3D Canon Viewer</title>
+    <meta name="description" content="3D model viewer for Aurelia-chan canon validation. Inspect the AI-generated model against master sheets.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+    <!-- ─── Header ──────────────────────────────────────────────────────── -->
+    <header class="viewer-header">
+        <div class="header-brand">
+            <span class="brand-icon">A</span>
+            <div class="brand-text">
+                <h1>Aurelia-chan</h1>
+                <span class="brand-subtitle">3D Canon Viewer v0.1</span>
+            </div>
+        </div>
+        <div class="header-controls">
+            <div class="model-info" id="modelInfo">
+                <span class="info-label">No model loaded</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ─── Main Layout ─────────────────────────────────────────────────── -->
+    <main class="viewer-layout">
+        <!-- 3D Canvas -->
+        <div class="canvas-container" id="canvasContainer">
+            <canvas id="viewerCanvas"></canvas>
+
+            <!-- Loading overlay -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading Aurelia...</p>
+                <p class="loading-subtext" id="loadingSubtext">Preparing 3D model</p>
+            </div>
+
+            <!-- Drop zone overlay -->
+            <div class="drop-overlay" id="dropOverlay">
+                <div class="drop-content">
+                    <div class="drop-icon">📦</div>
+                    <p>Drop GLB file here</p>
+                </div>
+            </div>
+
+            <!-- Canvas controls -->
+            <div class="canvas-toolbar">
+                <button class="toolbar-btn" id="btnWireframe" title="Toggle Wireframe">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/>
+                        <line x1="12" y1="2" x2="12" y2="22"/>
+                        <line x1="2" y1="8.5" x2="22" y2="8.5"/>
+                        <line x1="2" y1="15.5" x2="22" y2="15.5"/>
+                    </svg>
+                </button>
+                <button class="toolbar-btn" id="btnReset" title="Reset Camera">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                    </svg>
+                </button>
+                <button class="toolbar-btn" id="btnScreenshot" title="Screenshot">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M5 3v2"/>
+                    </svg>
+                </button>
+                <button class="toolbar-btn" id="btnAutoRotate" title="Auto Rotate">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Measurement overlay -->
+            <div class="measurement-badge" id="measurementBadge">
+                <span id="measureHeight">—</span> cm
+            </div>
+        </div>
+
+        <!-- ─── Side Panel ──────────────────────────────────────────────── -->
+        <aside class="side-panel">
+            <!-- Model Load -->
+            <section class="panel-section">
+                <h3 class="section-title">Load Model</h3>
+                <div class="load-controls">
+                    <button class="btn-primary" id="btnLoadDefault">
+                        Load Default Model
+                    </button>
+                    <label class="btn-secondary" for="fileInput">
+                        Browse GLB...
+                    </label>
+                    <input type="file" id="fileInput" accept=".glb,.gltf" hidden>
+                </div>
+                <p class="hint-text">Or drag & drop a .glb file onto the viewer</p>
+            </section>
+
+            <!-- Validation Report -->
+            <section class="panel-section" id="validationSection" style="display:none;">
+                <h3 class="section-title">Layer A — Mechanical QA</h3>
+                <div class="validation-grid" id="validationGrid"></div>
+            </section>
+
+            <!-- Visual QA Checklist -->
+            <section class="panel-section">
+                <h3 class="section-title">Layer B — Visual QA</h3>
+                <div class="qa-checklist" id="qaChecklist">
+                    <label class="qa-item"><input type="checkbox"> <span>B01: Adult 33yo face preserved</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B02: Short jet-black bob correct</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B03: Sapphire iris visible</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B04: Warm ivory skin consistent</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B05: 7.5-head / 170cm proportions</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B06: Blazer/blouse/trousers/heels</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B07: Gold accessories present</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B08: Expression professional</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B09: Side profile correct</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B10: Back profile correct</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B11: No mesh artifacts</span></label>
+                    <label class="qa-item"><input type="checkbox"> <span>B12: Hands/feet acceptable</span></label>
+                </div>
+                <div class="qa-actions">
+                    <button class="btn-approve" id="btnApprove">✓ Approve</button>
+                    <button class="btn-reject" id="btnReject">✗ Reject</button>
+                </div>
+            </section>
+
+            <!-- Lighting Controls -->
+            <section class="panel-section">
+                <h3 class="section-title">Lighting</h3>
+                <div class="slider-control">
+                    <label>Intensity</label>
+                    <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1.0">
+                </div>
+                <div class="slider-control">
+                    <label>Environment</label>
+                    <select id="envSelect">
+                        <option value="studio">Studio</option>
+                        <option value="outdoor">Outdoor</option>
+                        <option value="warm">Warm Indoor</option>
+                        <option value="neutral">Neutral</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Canon Colors Reference -->
+            <section class="panel-section">
+                <h3 class="section-title">Canon Colors</h3>
+                <div class="color-swatches">
+                    <div class="swatch" style="background:#F6EDE6;" title="Skin #F6EDE6"><span>Skin</span></div>
+                    <div class="swatch" style="background:#0E0E12; color:#fff;" title="Hair #0E0E12"><span>Hair</span></div>
+                    <div class="swatch" style="background:#2F5FB3; color:#fff;" title="Iris #2F5FB3"><span>Iris</span></div>
+                    <div class="swatch" style="background:#5A3FA0; color:#fff;" title="Inner #5A3FA0"><span>Inner</span></div>
+                    <div class="swatch" style="background:#0E0E12; color:#fff;" title="Blazer #0E0E12"><span>Blazer</span></div>
+                    <div class="swatch" style="background:#F7F7F7;" title="Shirt #F7F7F7"><span>Shirt</span></div>
+                    <div class="swatch" style="background:#C9A227;" title="Gold #C9A227"><span>Gold</span></div>
+                    <div class="swatch" style="background:#0A0A0A; color:#fff;" title="Heels #0A0A0A"><span>Heels</span></div>
+                </div>
+            </section>
+        </aside>
+    </main>
+
+    <!-- ─── Scripts ─────────────────────────────────────────────────────── -->
+    <!-- Three.js from CDN -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="viewer.js"></script>
+</body>
+</html>
