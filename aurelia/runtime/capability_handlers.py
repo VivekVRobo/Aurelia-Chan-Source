@@ -259,7 +259,7 @@ def verify_response(*, context: Any, dependencies: dict[str, Any]) -> Any:
     return MasterVerificationFirewall.verify(
         prose_text=str(rendered["response_text"]),
         numeric_checks=list(comp.get("numeric_checks", [])) or None,
-        has_evidence=context.grounded.has_corrobating_evidence,
+        has_evidence=context.grounded.has_corroborating_evidence,
     )
 
 
