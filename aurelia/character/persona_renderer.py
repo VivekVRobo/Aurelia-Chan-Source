@@ -193,10 +193,15 @@ class PersonaRenderer:
                 confidence=max(0.75, suggestion.confidence),
                 alternatives=[Emotion.NEUTRAL],
             )
-        if not evidence_available and cognitive_state and cognitive_state.upper() in {
-            "UNCERTAIN",
-            "CAUTIOUS",
-        }:
+        if (
+            not evidence_available
+            and cognitive_state
+            and cognitive_state.upper()
+            in {
+                "UNCERTAIN",
+                "CAUTIOUS",
+            }
+        ):
             return AffectSuggestion(
                 suggested_emotion=Emotion.CAUTIOUS,
                 suggested_intensity=AffectIntensity.SUBTLE,
