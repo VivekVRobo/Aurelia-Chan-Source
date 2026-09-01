@@ -28,6 +28,7 @@ jobs:
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
             aurelia/persistence/database.py \
+            aurelia/runtime/api_contract.py \
             aurelia/runtime/app_bootstrap.py \
             aurelia/runtime/capability_catalog.py \
             aurelia/runtime/capability_handlers.py \
@@ -37,6 +38,7 @@ jobs:
             aurelia/runtime/health.py \
             aurelia/runtime/persistence.py \
             test_dag_execution.py \
+            test_integration_hardening.py \
             test_persistence_runtime.py \
             test_persona_runtime.py \
             test_runtime_stabilization.py \
@@ -47,6 +49,7 @@ jobs:
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
             aurelia/persistence/database.py \
+            aurelia/runtime/api_contract.py \
             aurelia/runtime/app_bootstrap.py \
             aurelia/runtime/capability_catalog.py \
             aurelia/runtime/capability_handlers.py \
@@ -56,6 +59,7 @@ jobs:
             aurelia/runtime/health.py \
             aurelia/runtime/persistence.py \
             test_dag_execution.py \
+            test_integration_hardening.py \
             test_persistence_runtime.py \
             test_persona_runtime.py \
             test_runtime_stabilization.py \
@@ -66,7 +70,8 @@ jobs:
             test_runtime_stabilization \
             test_dag_execution \
             test_persistence_runtime \
-            test_persona_runtime
+            test_persona_runtime \
+            test_integration_hardening
 
   cognitive-os-v4-v6:
     runs-on: ubuntu-latest
