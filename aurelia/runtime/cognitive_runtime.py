@@ -152,7 +152,9 @@ class AureliaCognitiveRuntime:
         cognitive_state = str(rendered.get("cognitive_state", "FOCUSED"))
         persona_rendered = rendered.get("persona")
         if not isinstance(persona_rendered, PersonaRenderedResponse):
-            raise CognitiveExecutionError("User-visible DAG output bypassed Aurelia PersonaRenderer.")
+            raise CognitiveExecutionError(
+                "User-visible DAG output bypassed Aurelia PersonaRenderer."
+            )
 
         verification_key = "firewall" if "firewall" in execution.outputs else "verify_output"
         verification_report: VerificationReport = execution.outputs[verification_key]
