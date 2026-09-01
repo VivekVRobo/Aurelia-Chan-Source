@@ -279,7 +279,7 @@ def create_artifact(*, context: Any, dependencies: dict[str, Any]) -> tuple[Any,
     ]
     artifact = ArtifactWorkspaceCompiler.create_90_day_roadmap(
         artifact_id=f"art_{context.snapshot.snapshot_id}",
-        title="Compensation Decision Workspace",
+        title="Executive Counter-Offer Strategy & Script",
         decision_id=f"pending_{context.snapshot.snapshot_id}",
         milestones=milestones,
     )
