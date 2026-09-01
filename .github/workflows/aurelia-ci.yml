@@ -1,0 +1,80 @@
+name: Aurelia CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  stabilized-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+      - name: Compile package
+        run: python -m compileall -q aurelia
+      - name: Lint stabilized files
+        run: |
+          ruff check \
+            aurelia/runtime/cognitive_runtime.py \
+            aurelia/runtime/grounding.py \
+            aurelia/runtime/health.py \
+            test_runtime_stabilization.py \
+            test_v4_phase10_integration.py
+          ruff format --check \
+            aurelia/runtime/cognitive_runtime.py \
+            aurelia/runtime/grounding.py \
+            aurelia/runtime/health.py \
+            test_runtime_stabilization.py \
+            test_v4_phase10_integration.py
+      - name: Runtime stabilization regression tests
+        run: python -m unittest -v test_runtime_stabilization
+
+  cognitive-os-v4-v6:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      - name: Run V4 V5 V6 master suite
+        run: python test_all_cognitive_os.py
+
+  legacy-v3-phases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      - name: Run original phase suites
+        run: |
+          python -m unittest -v \
+            test_phase1_contracts \
+            test_phase2_knowledge \
+            test_phase2_specialists \
+            test_phase3_routing \
+            test_phase4_memory \
+            test_phase5_planning \
+            test_phase6_verification \
+            test_phase7_llm \
+            test_phase8_character \
+            test_phase9_higher_cognition \
+            test_phase10_learning \
+            test_phase11_evaluation \
+            test_phase12_runtime
