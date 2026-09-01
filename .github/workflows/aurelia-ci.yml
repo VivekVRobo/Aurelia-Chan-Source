@@ -25,6 +25,9 @@ jobs:
           ruff check \
             aurelia/character/persona_renderer.py \
             aurelia/cognition/planner.py \
+            aurelia/embodiment/__init__.py \
+            aurelia/embodiment/adapter.py \
+            aurelia/embodiment/contracts.py \
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
             aurelia/persistence/database.py \
@@ -38,6 +41,7 @@ jobs:
             aurelia/runtime/health.py \
             aurelia/runtime/persistence.py \
             test_dag_execution.py \
+            test_embodiment_contract.py \
             test_integration_hardening.py \
             test_persistence_runtime.py \
             test_persona_runtime.py \
@@ -46,6 +50,9 @@ jobs:
           ruff format --check \
             aurelia/character/persona_renderer.py \
             aurelia/cognition/planner.py \
+            aurelia/embodiment/__init__.py \
+            aurelia/embodiment/adapter.py \
+            aurelia/embodiment/contracts.py \
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
             aurelia/persistence/database.py \
@@ -59,6 +66,7 @@ jobs:
             aurelia/runtime/health.py \
             aurelia/runtime/persistence.py \
             test_dag_execution.py \
+            test_embodiment_contract.py \
             test_integration_hardening.py \
             test_persistence_runtime.py \
             test_persona_runtime.py \
@@ -71,7 +79,8 @@ jobs:
             test_dag_execution \
             test_persistence_runtime \
             test_persona_runtime \
-            test_integration_hardening
+            test_integration_hardening \
+            test_embodiment_contract
 
   cognitive-os-v4-v6:
     runs-on: ubuntu-latest
