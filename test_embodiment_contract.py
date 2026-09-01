@@ -8,7 +8,10 @@ from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
-from aurelia.embodiment.adapter import AureliaEmbodimentAdapter, EmbodimentContractError
+from aurelia.embodiment.adapter import (
+    AureliaEmbodimentAdapter,
+    EmbodimentContractError,
+)
 from aurelia.embodiment.contracts import (
     SCHEMA_VERSION,
     MotionCue,
@@ -18,7 +21,6 @@ from aurelia.embodiment.contracts import (
 from aurelia.llm.ollama_cortex import LocalOllamaCortex
 from aurelia.runtime.api_contract import serialize_cognitive_cycle
 from aurelia.runtime.cognitive_runtime import AureliaCognitiveRuntime
-
 
 FORBIDDEN_ACTUATOR_KEYS = {
     "actuator",
