@@ -27,6 +27,7 @@ jobs:
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
             aurelia/persistence/database.py \
+            aurelia/runtime/app_bootstrap.py \
             aurelia/runtime/capability_catalog.py \
             aurelia/runtime/capability_handlers.py \
             aurelia/runtime/cognitive_runtime.py \
@@ -43,6 +44,7 @@ jobs:
             aurelia/execution/dag_executor.py \
             aurelia/execution/executor.py \
             aurelia/persistence/database.py \
+            aurelia/runtime/app_bootstrap.py \
             aurelia/runtime/capability_catalog.py \
             aurelia/runtime/capability_handlers.py \
             aurelia/runtime/cognitive_runtime.py \
