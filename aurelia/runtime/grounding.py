@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from aurelia.contracts.core_types import UserGoal
@@ -53,7 +53,7 @@ class RuntimeGrounder:
         chat_history: list[dict[str, str]] | None,
         top_k: int,
     ) -> GroundedContext:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         candidates = self._history_candidates(user_text, chat_history, now)
         query_entities = self._query_entities(entities, user_role, target_role)
         memories = HybridMemoryRetriever.retrieve(
