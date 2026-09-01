@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from collections.abc import Sequence
 from dataclasses import asdict, is_dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any
 
 from aurelia.artifacts.schemas import ExecutiveArtifact
 from aurelia.contracts.core_types import (
@@ -237,7 +238,7 @@ class CognitiveDatabase:
                 _json_dumps(inference.confidence),
                 inference.reasoning_method,
                 candidate_id,
-                datetime.now().astimezone().isoformat(),
+                datetime.now(UTC).isoformat(),
             ),
         )
 
@@ -369,7 +370,7 @@ class CognitiveDatabase:
                 {
                     "id": inference.id,
                     "content": inference.claim,
-                    "timestamp": datetime.now().astimezone(),
+                    "timestamp": datetime.now(UTC),
                     "reliability_weight": inference.confidence.evidence_weight,
                     "source_type": "canonical_inference",
                 }
@@ -413,7 +414,7 @@ def _json_default(value: Any) -> Any:
 def _fact_observed_at(fact: Fact) -> datetime:
     if fact.evidence:
         return max(evidence.observed_at for evidence in fact.evidence)
-    return datetime.now().astimezone()
+    return datetime.now(UTC)
 
 
 def _parse_datetime(value: Any) -> datetime | None:
@@ -428,7 +429,7 @@ def _evidence_from_payload(payload: dict[str, Any]) -> EvidenceRef:
         source_type=str(payload["source_type"]),
         content_snippet=str(payload["content_snippet"]),
         reliability=EvidenceReliability(float(payload["reliability"])),
-        observed_at=_parse_datetime(payload.get("observed_at")) or datetime.now().astimezone(),
+        observed_at=_parse_datetime(payload.get("observed_at")) or datetime.now(UTC),
         valid_from=_parse_datetime(payload.get("valid_from")),
         valid_to=_parse_datetime(payload.get("valid_to")),
         metadata=dict(payload.get("metadata", {})),
