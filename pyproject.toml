@@ -14,6 +14,9 @@ dependencies = [
   "requests>=2.32,<3",
 ]
 
+[project.scripts]
+aurelia-server = "aurelia.runtime.app_bootstrap:main"
+
 [project.optional-dependencies]
 dev = [
   "pytest>=8.3",
