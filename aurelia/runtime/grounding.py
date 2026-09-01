@@ -1,4 +1,4 @@
-"""Ground runtime context in actual conversation memory and career-graph facts."""
+"""Ground runtime context in actual memory and career-graph facts."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ class GroundedContext:
         sections: list[str] = []
         if self.memories:
             memory_lines = [f"- {item.content}" for item in self.memories]
-            sections.append("Retrieved conversation context:\n" + "\n".join(memory_lines))
+            sections.append("Retrieved memory context:\n" + "\n".join(memory_lines))
         if self.graph_facts:
             graph_lines = [f"- {fact}" for fact in self.graph_facts]
             sections.append("Career graph context:\n" + "\n".join(graph_lines))
@@ -51,10 +51,12 @@ class RuntimeGrounder:
         target_role: str,
         active_goal: UserGoal,
         chat_history: list[dict[str, str]] | None,
+        persistent_candidates: list[dict[str, Any]] | None = None,
         top_k: int,
     ) -> GroundedContext:
         now = datetime.now(UTC)
-        candidates = self._history_candidates(user_text, chat_history, now)
+        candidates = list(persistent_candidates or ())
+        candidates.extend(self._history_candidates(user_text, chat_history, now))
         query_entities = self._query_entities(entities, user_role, target_role)
         memories = HybridMemoryRetriever.retrieve(
             query_text=user_text,
