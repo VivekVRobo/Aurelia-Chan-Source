@@ -1,0 +1,90 @@
+name: Aurelia Software Validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  package-and-stabilization:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+      - name: Compile package
+        run: python -m compileall -q aurelia
+      - name: Lint stabilized runtime
+        run: |
+          ruff check \
+            aurelia/character/persona_renderer.py \
+            aurelia/cognition/planner.py \
+            aurelia/embodiment \
+            aurelia/execution/dag_executor.py \
+            aurelia/execution/executor.py \
+            aurelia/persistence/database.py \
+            aurelia/runtime/api_contract.py \
+            aurelia/runtime/app_bootstrap.py \
+            aurelia/runtime/capability_catalog.py \
+            aurelia/runtime/capability_handlers.py \
+            aurelia/runtime/cognitive_runtime.py \
+            aurelia/runtime/dag_verification.py \
+            aurelia/runtime/grounding.py \
+            aurelia/runtime/health.py \
+            aurelia/runtime/persistence.py \
+            tests/stabilization \
+            tests/v4/test_v4_phase10_integration.py
+          ruff format --check \
+            aurelia/character/persona_renderer.py \
+            aurelia/cognition/planner.py \
+            aurelia/embodiment \
+            aurelia/execution/dag_executor.py \
+            aurelia/execution/executor.py \
+            aurelia/persistence/database.py \
+            aurelia/runtime/api_contract.py \
+            aurelia/runtime/app_bootstrap.py \
+            aurelia/runtime/capability_catalog.py \
+            aurelia/runtime/capability_handlers.py \
+            aurelia/runtime/cognitive_runtime.py \
+            aurelia/runtime/dag_verification.py \
+            aurelia/runtime/grounding.py \
+            aurelia/runtime/health.py \
+            aurelia/runtime/persistence.py \
+            tests/stabilization \
+            tests/v4/test_v4_phase10_integration.py
+      - name: Stabilization regressions
+        run: pytest -q tests/stabilization
+
+  legacy-v3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+      - name: Run V3 phase suite
+        run: pytest -q tests/v3
+
+  cognitive-v4-v6:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+      - name: Run V4 V5 V6 suites
+        run: pytest -q tests/v4 tests/v5 tests/v6

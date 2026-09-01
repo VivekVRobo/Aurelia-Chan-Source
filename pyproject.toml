@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aurelia-cognitive-os"
+version = "0.6.0.dev0"
+description = "Aurelia-chan cognitive runtime and character intelligence system"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "Flask>=3.0,<4",
+  "flask-cors>=4,<7",
+  "requests>=2.32,<3",
+]
+
+[project.scripts]
+aurelia-server = "aurelia.runtime.app_bootstrap:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+  "ruff>=0.12",
+]
+voice = [
+  "edge-tts>=6.1",
+]
+pipeline = [
+  "Pillow>=10",
+]
+
+[tool.setuptools.packages.find]
+include = ["aurelia*"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
