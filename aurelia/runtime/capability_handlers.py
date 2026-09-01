@@ -251,5 +251,63 @@ def verify_response(*, context: Any, dependencies: dict[str, Any]) -> Any:
     return MasterVerificationFirewall.verify(
         prose_text=str(rendered["response_text"]),
         numeric_checks=list(comp.get("numeric_checks", [])) or None,
-        has_evidence=context.grounded.has_corrr???
+        has_evidence=context.grounded.has_corroborating_evidence,
     )
+
+
+def create_artifact(*, context: Any, dependencies: dict[str, Any]) -> tuple[Any, ...]:
+    report = dependencies["firewall"]
+    if not report.is_safe_to_publish or context.intent != IntentType.COMPENSATION_STRATEGY:
+        return ()
+    milestones = [
+        ArtifactMilestone(
+            "m1",
+            "Evidence Review",
+            "Review the verified package inputs",
+            ("Confirm package facts",),
+            ("Verified inputs",),
+        ),
+        ArtifactMilestone(
+            "m2",
+            "Decision Record",
+            "Document the selected next action",
+            ("Record the decision",),
+            ("Decision record",),
+        ),
+    ]
+    artifact = ArtifactWorkspaceCompiler.create_90_day_roadmap(
+        artifact_id=f"art_{context.snapshot.snapshot_id}",
+        title="Executive Counter-Offer Strategy & Script",
+        decision_id=f"pending_{context.snapshot.snapshot_id}",
+        milestones=milestones,
+    )
+    return (artifact,)
+
+
+def _money_values(text: str) -> list[float]:
+    values = []
+    for raw, suffix in re.findall(r"\$\s*([\d,.]+)\s*([kKmM]?)", text):
+        amount = float(raw.replace(",", ""))
+        if suffix.lower() == "k":
+            amount *= 1_000.0
+        elif suffix.lower() == "m":
+            amount *= 1_000_000.0
+        values.append(amount)
+    return values
+
+
+def _money_near_label(text: str, label: str) -> float | None:
+    patterns = (
+        rf"{label}[^$\d]{{0,20}}\$\s*([\d,.]+)\s*([kKmM]?)",
+        rf"\$\s*([\d,.]+)\s*([kKmM]?)[^\n,.]{{0,20}}{label}",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            amount = float(match.group(1).replace(",", ""))
+            if match.group(2).lower() == "k":
+                amount *= 1_000.0
+            elif match.group(2).lower() == "m":
+                amount *= 1_000_000.0
+            return amount
+    return None
