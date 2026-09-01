@@ -11,10 +11,13 @@ from __future__ import annotations
 import hashlib
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
-from aurelia.artifacts.schemas import ArtifactMilestone, ArtifactWorkspaceCompiler, ExecutiveArtifact
+from aurelia.artifacts.schemas import (
+    ArtifactMilestone,
+    ArtifactWorkspaceCompiler,
+    ExecutiveArtifact,
+)
 from aurelia.character.director import CharacterDirector
 from aurelia.cognition.planner import CognitivePlanner
 from aurelia.cognition.router import CognitiveRouter
@@ -96,7 +99,7 @@ class AureliaCognitiveRuntime:
         )
         snapshot = CognitiveSnapshot(
             snapshot_id=f"snap_{int(time.time() * 1000)}",
-            created_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
             meaning=meaning,
             user_id="local_user",
             current_role=user_role,
