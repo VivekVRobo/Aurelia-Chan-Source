@@ -88,3 +88,13 @@ jobs:
           pip install -e '.[dev]'
       - name: Run V4 V5 V6 suites
         run: pytest -q tests/v4 tests/v5 tests/v6
+
+  frontend-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Frontend contract and source-integrity tests
+        run: npm run test:frontend
