@@ -8,13 +8,12 @@ function source(path) {
 
 test('active bootstrap installs contract and integrity overlay around legacy UI', () => {
   const bootstrap = source('app.js');
-  const contractIndex = bootstrap.indexOf('frontend/cognitive_contract.js');
-  const legacyIndex = bootstrap.indexOf('app_legacy.js');
-  const patchIndex = bootstrap.indexOf('frontend/integrity_patch.js');
+  const writes = [...bootstrap.matchAll(/document\.write\('([^']+)'\)/g)].map(match => match[1]);
 
-  assert.ok(contractIndex >= 0, 'active bootstrap must install cognitive contract');
-  assert.ok(legacyIndex > contractIndex, 'legacy UI must load after the cognitive contract');
-  assert.ok(patchIndex > legacyIndex, 'integrity overlay must load after legacy UI registration');
+  assert.equal(writes.length, 3, 'active bootstrap must inject exactly three ordered scripts');
+  assert.match(writes[0], /frontend\/cognitive_contract\.js/);
+  assert.match(writes[1], /app_legacy\.js/);
+  assert.match(writes[2], /frontend\/integrity_patch\.js/);
 });
 
 test('active interaction layer contains no fabricated cognitive evidence or confidence constants', () => {
