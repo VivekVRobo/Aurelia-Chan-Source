@@ -9,17 +9,19 @@ the specialist engines during stabilization.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
 from aurelia.execution.capability import CapabilityPermission, CapabilityResult
-from aurelia.execution.capability_registry import CapabilityRegistry as LegacyCapabilityRegistry
+from aurelia.execution.capability_registry import (
+    CapabilityRegistry as LegacyCapabilityRegistry,
+)
 from aurelia.execution.registry import CapabilityRegistry
 from aurelia.knowledge.career_graph import analyze_career_path, create_sample_career_graph
+from aurelia.skills.compensation.salary_engine import SalaryAnalysisRequest, SalaryEngine
 from aurelia.skills.interview.scorer import InterviewScorer
 from aurelia.skills.resume.parser import ResumeParser
-from aurelia.skills.compensation.salary_engine import SalaryAnalysisRequest, SalaryEngine
 
 
 class TypedExecutor:
@@ -218,6 +220,4 @@ class ExecutionEngine:
                 str(context.get("target_role", "")),
             )
 
-        raise ValueError(
-            f"Legacy capability '{capability_name}' has no compatibility handler yet."
-        )
+        raise ValueError(f"Legacy capability '{capability_name}' has no compatibility handler yet.")
