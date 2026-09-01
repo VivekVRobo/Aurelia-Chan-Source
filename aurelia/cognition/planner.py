@@ -54,10 +54,15 @@ class CognitivePlanner:
                 capability_id="response.format.direct",
                 dependencies=("mem_lookup",),
             )
+            verifier = PlanNode(
+                node_id="verify_output",
+                capability_id="verification.firewall.verify",
+                dependencies=("resp_format",),
+            )
             return CognitivePlan(
                 plan_id=f"plan_reflex_{meaning.frame_id}",
                 budget=budget,
-                nodes=(mem_lookup, response),
+                nodes=(mem_lookup, response, verifier),
                 entry_node_id="mem_lookup",
                 exit_node_id="resp_format",
             )
@@ -123,8 +128,6 @@ class CognitivePlanner:
                     artifact,
                 ),
                 entry_node_id="parse_offer",
-                # Renderer is the response-producing node; verification and artifact
-                # generation still execute before publication is authorized.
                 exit_node_id="renderer",
             )
 
