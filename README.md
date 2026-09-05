@@ -1,366 +1,280 @@
-# Aurelia-chan — Executive Career Mentor & Life Strategist
+# Aurelia — Cognitive Runtime & Character Intelligence System
 
-A sophisticated interactive AI character featuring dynamic expression portraits, multi-language voice synthesis, resume auditing, interview simulation, and a complete 3D production pipeline for character model generation.
+[![Aurelia Software Validation](https://github.com/VivekVRobo/Aurelia-Chan-Source/actions/workflows/aurelia-ci.yml/badge.svg)](https://github.com/VivekVRobo/Aurelia-Chan-Source/actions/workflows/aurelia-ci.yml)
 
-## 🌟 Features
+**Aurelia** is an experimental character-intelligence and cognitive-runtime project built around a modular Python 3.12 package, a durable Flask application runtime, explicit planning and execution contracts, persistence, persona rendering, embodiment boundaries, and a browser character interface.
 
-### Web Application
-- **Interactive Character Stage**: 11 dynamic expression portraits with smooth transitions
-- **Mentor Chat Module**: AI-powered career guidance with contextual responses
-- **Resume Audit Tool**: Executive-level resume analysis with scoring system
-- **Interview Simulator**: Practice scenarios with real-time feedback
-- **Multi-language Support**: English, Japanese, German, French, Spanish
-- **Free Voice Synthesis**: Neural voice synthesis using Web Speech API
-- **Professional Design**: Executive-inspired dark theme with gold accents
+The repository began as an interactive character and career-mentor experience. It has since grown into a broader engineering project: the current `main` branch contains a packaged cognitive runtime (`aurelia-cognitive-os`), stabilization suites, DAG execution, persistence, runtime health/grounding contracts, frontend integrity checks, and an explicit software-to-embodiment boundary.
 
-### 3D Production Pipeline
-- **AI-Assisted 3D Generation**: Integration with Meshy and Tripo AI services
-- **Reference Preparation**: Automated extraction from master character sheets
-- **Canon Validation**: Two-layer quality assurance (mechanical + visual)
-- **3D Model Viewer**: WebGL-based inspection tool with validation checklist
-- **Material System**: Comprehensive PBR material specifications
-- **Optimization**: Desktop and mobile optimization targets
+> **Engineering status:** active experimental software. The repository demonstrates architecture, software contracts, tests, and integration work. It is **not** a claim of AGI, production safety certification, or validated physical autonomy.
 
-## 📋 Prerequisites
+## Project snapshot
 
-### Required Software
-- **Python 3.8+**: For pipeline scripts and voice generation
-- **Modern Web Browser**: Chrome, Firefox, Safari, or Edge (for web app and viewer)
-- **Blender** (optional): For advanced 3D model processing
+| Area | Current state |
+| --- | --- |
+| Python package | `aurelia-cognitive-os` `0.6.0.dev0` |
+| Runtime | Flask-backed canonical application bootstrap |
+| Planning/execution | Planner + capability registry + DAG execution |
+| State | Durable SQLite-backed runtime persistence |
+| Character layer | Persona renderer + expression/voice assets |
+| Embodiment | Explicit software contract and tested boundary |
+| Frontend | Browser character stage with source/contract integrity tests |
+| Local model path | Optional Ollama integration |
+| Validation | Stabilization, V3–V6, frontend integrity, lint/format CI |
+| Physical robot evidence | Not claimed by this repository |
 
-### Required Python Packages
-```bash
-pip install requests Pillow edge-tts
+## Why this project exists
+
+A character interface becomes much more interesting when its behavior is not a single monolithic script. Aurelia explores how to separate the pieces that make an interactive agent understandable and testable:
+
+- **cognition** — planning and reasoning-oriented orchestration;
+- **execution** — capability dispatch and DAG execution;
+- **grounding and verification** — contracts around what can safely be surfaced;
+- **persistence** — durable state instead of process-only memory;
+- **persona** — character presentation kept separate from execution logic;
+- **embodiment** — an explicit boundary between software intent and external actuation;
+- **interface integrity** — tests that protect the browser stage from drifting away from backend contracts.
+
+The goal is not to hide complexity behind an “AI assistant” label. The goal is to make the runtime inspectable, testable, and progressively evidence-backed.
+
+## Runtime architecture
+
+```text
+Browser / API client
+        |
+        v
+Canonical Flask application
+        |
+        v
+AureliaCognitiveRuntime
+   |        |         |
+   |        |         +--> Persona / character rendering
+   |        +------------> Durable persistence
+   +---------------------> Planner + capability registry
+                              |
+                              v
+                         DAG execution
+                              |
+                              v
+                   Grounding / verification contracts
+                              |
+                              v
+                     Structured API response
+
+External or physical embodiment
+        ^
+        |
+Explicit embodiment contract
+(no physical validation is implied)
 ```
 
-### Optional (for 3D Pipeline)
-- **Meshy API Key**: Sign up at https://www.meshy.ai/
-- **Tripo API Key**: Sign up at https://developers.tripo3d.com/
+### Core implementation areas
 
-## 🚀 Quick Start
+- [`aurelia/runtime/`](aurelia/runtime/) — canonical runtime, API contracts, health, grounding, persistence and capability wiring.
+- [`aurelia/cognition/`](aurelia/cognition/) — planning-oriented cognition components.
+- [`aurelia/execution/`](aurelia/execution/) — execution and DAG machinery.
+- [`aurelia/persistence/`](aurelia/persistence/) — durable database layer.
+- [`aurelia/character/`](aurelia/character/) — persona and presentation behavior.
+- [`aurelia/embodiment/`](aurelia/embodiment/) — typed software boundary for embodiment-facing behavior.
+- [`docs/architecture/embodiment-contract.md`](docs/architecture/embodiment-contract.md) — architecture-level embodiment contract.
+- [`frontend/`](frontend/) — browser-side cognitive contract and integrity layer.
+- [`tests/`](tests/) — stabilization and versioned regression suites.
 
-### 1. Web Application
-Simply open `index.html` in a modern web browser. No installation required!
+The canonical server bootstrap is [`aurelia/runtime/app_bootstrap.py`](aurelia/runtime/app_bootstrap.py). It creates the durable cognitive runtime, installs hardened HTTP handlers, exposes runtime readiness information, and fails closed when the cognitive runtime is unavailable.
 
-```bash
-# Option 1: Direct file open
-open index.html
+## Quick start
 
-# Option 2: Local server (recommended for full functionality)
-python -m http.server 8000
-# Then visit http://localhost:8000
-```
+### Requirements
 
-### 2. Voice Generation (Optional)
-Generate offline voice files for Aurelia:
+- Python **3.12+**
+- `pip`
+- Node.js 22+ only if you want to run the frontend integrity suite locally
+- Ollama only for the optional local-model path
 
-```bash
-python generate_voice.py
-```
-
-This creates an `audio_pack/` directory with MP3 files in multiple languages.
-
-### 3. 3D Pipeline (Requires API Keys)
-#### Step 1: Configure API Keys
-Edit `pipeline/config.json` and add your API keys:
-
-```json
-{
-  "provider": {
-    "meshy": {
-      "api_key": "your_meshy_api_key_here"
-    },
-    "tripo": {
-      "api_key": "your_tripo_api_key_here"
-    }
-  }
-}
-```
-
-#### Step 2: Run Full Pipeline
-```bash
-python pipeline/run_pipeline.py
-```
-
-#### Step 3: Review Generated Model
-Open `viewer/index.html` in a browser and load the generated GLB file.
-
-## 📁 Project Structure
-
-```
-Aurelia-Chan/
-├── index.html              # Main web application
-├── app.js                  # Application logic (514 lines)
-├── style.css               # Executive design system (756 lines)
-├── generate_voice.py       # Voice generation script
-├── README.md               # This file
-│
-├── aurelia-canon/          # Character specifications
-│   ├── AURELIA_CHAN_IMMUTABLE_CHARACTER_BIBLE.md
-│   └── master-sheets/      # 15 reference blueprints
-│
-├── aurelia-expressions/    # 11 expression portraits
-│   ├── 01-neutral-observing.png
-│   ├── 02-subtle-confident-smile.png
-│   └── ... (9 more expressions)
-│
-├── pipeline/               # 3D production pipeline
-│   ├── config.json         # Pipeline configuration
-│   ├── run_pipeline.py     # Master orchestrator
-│   ├── generate_3d.py      # AI generation coordinator
-│   ├── prepare_references.py # Reference image processing
-│   ├── providers/          # AI service integrations
-│   │   ├── base.py         # Provider interface
-│   │   ├── meshy.py        # Meshy implementation
-│   │   └── tripo.py        # Tripo implementation
-│   └── validation/         # Canon compliance checking
-│       └── canon_checker.py
-│
-├── viewer/                 # 3D model viewer
-│   ├── index.html
-│   ├── viewer.css
-│   └── viewer.js
-│
-└── assets/                 # Asset management
-    ├── raw/                # Generated 3D models
-    ├── approved/           # Approved models
-    └── web/                # Web-optimized models
-```
-
-## 🎨 Character Canon
-
-Aurelia-chan is an immutable character with strict design specifications:
-
-- **Age**: 33 years (permanently fixed)
-- **Height**: 170 cm / 5'7" (7.5-head proportion system)
-- **Appearance**: Warm ivory skin, jet-black bob hair, sapphire eyes
-- **Wardrobe**: Executive blazer, ivory blouse, charcoal trousers, heels
-- **Accessories**: Gold stud earrings, pendant necklace, black-and-gold watch
-
-All character assets must comply with the specifications in `aurelia-canon/AURELIA_CHAN_IMMUTABLE_CHARACTER_BIBLE.md`.
-
-## 🔧 Configuration
-
-### Pipeline Configuration
-Edit `pipeline/config.json` to customize:
-
-- **API Keys**: Add service credentials
-- **Paths**: Configure asset directories
-- **Canon Specifications**: Character measurements and colors
-- **Materials**: PBR material properties
-- **Optimization**: Polygon counts and texture resolutions
-- **Blender Settings**: Scene units and scale
-
-### Web Application Configuration
-The web application uses client-side configuration in `app.js`:
-
-- **Voice Settings**: Pitch, rate, and language preferences
-- **Expression Mappings**: Text-to-expression associations
-- **Translation Dictionary**: Multi-language support strings
-
-## 📊 Usage Examples
-
-### Running Specific Pipeline Steps
+### Install the software package
 
 ```bash
-# Prepare reference images only
-python pipeline/run_pipeline.py --step prepare
-
-# Generate 3D model only
-python pipeline/run_pipeline.py --step generate
-
-# Validate existing model
-python pipeline/run_pipeline.py --step validate
-
-# Use specific provider
-python pipeline/run_pipeline.py --provider tripo
-
-# Skip generation (use existing GLB)
-python pipeline/run_pipeline.py --skip-generate
+git clone https://github.com/VivekVRobo/Aurelia-Chan-Source.git
+cd Aurelia-Chan-Source
+python -m venv .venv
 ```
 
-### Voice Generation
+Activate the environment, then install the package and development dependencies:
 
 ```bash
-# Generate all voice files
-python generate_voice.py
-
-# Output: audio_pack/
-#   ├── welcome_en.mp3
-#   ├── greeting_ja.mp3
-#   ├── approval_en.mp3
-#   └── warning_en.mp3
+python -m pip install --upgrade pip
+pip install -e '.[dev]'
 ```
 
-### Model Validation
+On Windows PowerShell, virtual-environment activation is typically:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+On Linux/macOS:
 
 ```bash
-# Validate specific model
-python pipeline/validation/canon_checker.py assets/web/aurelia.glb
-
-# Validate latest generated model
-python pipeline/validation/canon_checker.py --latest
+source .venv/bin/activate
 ```
 
-## 🎯 Web Application Modules
+### Start the canonical runtime
 
-### Mentor Chat
-- Interactive conversation with Aurelia-chan
-- Context-aware expression changes
-- Voice synthesis for responses
-- Multi-language support
+```bash
+aurelia-server
+```
 
-### Resume Audit
-- Paste resume text for analysis
-- Executive alignment scoring (0-100%)
-- Strengths and improvement suggestions
-- Professional feedback
+Defaults:
 
-### Interview Simulator
-- Practice executive interview scenarios
-- Real-time response evaluation
-- Score-based feedback system
-- Multiple scenario options
+- host: `127.0.0.1`
+- port: `5000`
+- SQLite state: `data/aurelia.db`
 
-### Canon Specification
-- View canonical color palette
-- Access 15 master reference sheets
-- Character specification documentation
-- Quality assurance guidelines
+Optional environment overrides:
 
-## 🔍 3D Viewer Features
+```text
+AURELIA_HOST
+AURELIA_PORT
+AURELIA_DB_PATH
+```
 
-- **Model Loading**: Drag-and-drop or file selection
-- **Orbit Controls**: Smooth camera navigation
-- **Studio Lighting**: 3-point lighting setup
-- **Wireframe Mode**: Toggle mesh visualization
-- **Auto-Rotate**: Continuous model rotation
-- **Screenshot Export**: Save model views
-- **Real-time Stats**: Polygon count, materials, dimensions
-- **Validation Interface**: Layer A mechanical QA display
-- **Visual QA Checklist**: Interactive Layer B review
-- **Environment Presets**: Studio, outdoor, warm, neutral
+The runtime status endpoint is available at:
 
-## 🐛 Troubleshooting
+```text
+GET /api/runtime-status
+```
 
-### Web Application Issues
+## Validation
 
-**Voice not working:**
-- Ensure browser supports Web Speech API
-- Check voice toggle is enabled
-- Verify language selection matches installed voices
+The repository treats tests as part of the architecture rather than an afterthought.
 
-**Expression portraits not loading:**
-- Verify `aurelia-expressions/` directory exists
-- Check image file permissions
-- Ensure images are named correctly
+### Stabilized runtime
 
-**Chat responses not appearing:**
-- Check browser console for JavaScript errors
-- Verify `app.js` is loaded correctly
-- Test with simple input first
+```bash
+pytest -q tests/stabilization
+```
 
-### Pipeline Issues
+This suite covers areas such as runtime stabilization, DAG execution, persona behavior, persistence, and the embodiment contract.
 
-**API key errors:**
-- Verify API keys are correctly set in `pipeline/config.json`
-- Check API key format (no extra spaces)
-- Ensure API service account is active
+### Versioned regression suites
 
-**Reference image preparation fails:**
-- Verify master sheets exist in `aurelia-canon/master-sheets/`
-- Check Pillow installation: `pip install Pillow`
-- Ensure sufficient disk space
+```bash
+pytest -q tests/v3
+pytest -q tests/v4 tests/v5 tests/v6
+```
 
-**3D generation fails:**
-- Check internet connection
-- Verify API key has sufficient credits
-- Try alternative provider (meshy/tripo)
-- Check service status pages
+### Frontend integrity
 
-**Model validation fails:**
-- Ensure GLB file is valid format
-- Check file size exceeds limits
-- Verify model has required materials
+```bash
+npm run test:frontend
+```
 
-### Python Script Issues
+### CI gates
 
-**Import errors:**
-- Ensure all required packages are installed
-- Check Python version (3.8+ required)
-- Verify package names are correct
+GitHub Actions currently separates validation into four jobs:
 
-**File permission errors:**
-- Run scripts with appropriate permissions
-- Check directory write access
-- Verify file paths are correct
+1. **package-and-stabilization** — package install, compile, Ruff checks, formatting and stabilization regressions;
+2. **legacy-v3** — V3 regression suite;
+3. **cognitive-v4-v6** — V4/V5/V6 cognitive suites;
+4. **frontend-integrity** — JavaScript contract and source-integrity tests.
 
-**Network timeouts:**
-- Check internet connection
-- Increase timeout values in scripts
-- Verify firewall settings
+This separation makes regressions easier to localize and prevents a green UI check from being mistaken for a green cognitive runtime.
 
-## 📈 Performance Optimization
+## Local model integration
 
-### Web Application
-- Lazy-load expression portraits
-- Optimize image sizes (target < 2MB per portrait)
-- Minimize JavaScript bundle size
-- Use browser caching for static assets
+Aurelia includes an optional local-model path built around Ollama. It is not required for installing or inspecting the software architecture.
 
-### 3D Pipeline
-- Use appropriate polygon counts (desktop: 80K, mobile: 40K)
-- Optimize texture resolutions (desktop: 2048px, mobile: 1024px)
-- Compress GLB files using glTF-Pipeline
-- Enable Draco compression for web delivery
+See [`OLLAMA_SETUP.md`](OLLAMA_SETUP.md) for the current local setup path.
 
-## 🔒 Security Considerations
+## Character and media layer
 
-- **API Keys**: Never commit API keys to version control
-- **User Input**: Web app has basic input validation
-- **File Uploads**: Viewer only accepts GLB/GLTF files
-- **Network Traffic**: All API calls use HTTPS
+The cognitive runtime is only one part of Aurelia. The repository also retains the character-production work that the project started with:
 
-## 🤝 Contributing
+- immutable character canon and master reference sheets;
+- expression portraits;
+- browser character stage;
+- voice-generation tooling;
+- 3D reference/generation/validation pipeline;
+- WebGL-oriented model-viewer assets.
 
-To contribute to Aurelia-chan:
+These assets are presentation and production layers around the runtime; they should not be interpreted as evidence of autonomous physical embodiment.
 
-1. Follow the character canon specifications strictly
-2. Test changes across all supported browsers
-3. Validate 3D models against canon requirements
-4. Update documentation for any new features
-5. Maintain code style consistency
+## Evidence and maturity boundaries
 
-## 📄 License
+### Demonstrated in the repository
 
-This project is proprietary. All character assets, specifications, and generated content are subject to copyright and intellectual property restrictions.
+- modular Python package structure;
+- durable application bootstrap and SQLite-backed state;
+- capability registration and DAG-oriented execution;
+- fail-closed runtime/API behavior;
+- persona/runtime separation;
+- embodiment software contract;
+- versioned automated regression suites;
+- frontend source/contract integrity checks.
 
-## 📞 Support
+### Not demonstrated by this repository alone
 
-For issues or questions:
-- Check this README first
-- Review the character bible for canon questions
-- Consult API documentation for service-specific issues
-- Check browser console for web application errors
+- AGI or human-level general intelligence;
+- safety certification;
+- production reliability under large-scale load;
+- real-world robotic actuation;
+- physical perception, manipulation, or navigation evidence;
+- guaranteed correctness of model-generated content.
 
-## 🎯 Roadmap
+Those boundaries are intentional. Future claims should be added only when matching evidence exists.
 
-### Current Version: 1.0
-- ✅ Web application with all modules
-- ✅ Character canon and master sheets
-- ✅ Expression portrait system
-- ✅ 3D pipeline infrastructure
-- ✅ Multi-language support
-- ✅ Voice synthesis
+## Repository structure
 
-### Planned Features
-- [ ] Blender automation scripts
-- [ ] Advanced material processing
-- [ ] Animation system integration
-- [ ] Mobile app version
-- [ ] Additional language support
-- [ ] Cloud deployment options
+```text
+Aurelia-Chan-Source/
+├── aurelia/                 # packaged cognitive/character runtime
+│   ├── cognition/           # planning and cognition
+│   ├── execution/           # capability and DAG execution
+│   ├── runtime/             # canonical runtime/API/bootstrap
+│   ├── persistence/         # durable state
+│   ├── character/           # persona rendering
+│   └── embodiment/          # embodiment-facing contracts
+├── tests/
+│   ├── stabilization/       # stabilization regressions
+│   ├── v3/                  # legacy/versioned validation
+│   ├── v4/
+│   ├── v5/
+│   └── v6/
+├── frontend/                # browser contract/integrity layer
+├── docs/architecture/       # architecture contracts
+├── aurelia-canon/           # character canon + reference sheets
+├── aurelia-expressions/     # expression assets
+├── pipeline/                # character/3D production tooling
+├── integrated_backend.py    # integrated Flask application layer
+├── pyproject.toml           # package metadata and dev tooling
+└── .github/workflows/       # automated validation
+```
 
----
+## Engineering roadmap
 
-**Aurelia-chan Project Canon v1.0 — Immutable Master Authority**
+The next high-value milestones are evidence-oriented rather than feature-count oriented:
+
+- [ ] publish a deterministic end-to-end cognitive-cycle fixture with a machine-readable result artifact;
+- [ ] add runtime latency and persistence-performance baselines;
+- [ ] document the capability registry and DAG schema with one reproducible trace;
+- [ ] add API contract examples for success and fail-closed behavior;
+- [ ] define a release-readiness checklist for the first tagged software release;
+- [ ] keep any future embodiment claims gated behind real integration evidence.
+
+## Contributing
+
+Before changing runtime behavior:
+
+1. preserve the separation between cognition, execution, persona, persistence, and embodiment;
+2. add or update the narrowest relevant regression test;
+3. keep failure behavior explicit rather than returning success-looking fallbacks;
+4. run the relevant Python and/or frontend suites;
+5. do not add physical or production-readiness claims without matching evidence.
+
+## License and use
+
+This repository is publicly viewable for project development, demonstration, and review, but the project is currently **proprietary**. No open-source license grant is implied by public source visibility. Character assets, specifications, and generated content remain subject to their applicable copyright and intellectual-property restrictions.
+
+## Author
+
+**Vivek Vala** — Robotics & Automation student building projects across autonomous systems, robotics software, computer vision, embedded systems, and agent architectures.
