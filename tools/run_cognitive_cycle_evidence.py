@@ -88,13 +88,17 @@ def _run_once(db_path: Path) -> tuple[dict[str, object], float, dict[str, object
             )
         elapsed_ms = (time.perf_counter() - started) * 1000.0
         persistence = runtime.persistence.diagnostics()
-        return _normalize(result), elapsed_ms, {
-            "durable": bool(persistence["durable"]),
-            "decision_receipts": int(persistence["decision_receipts"]),
-            "executive_artifacts": int(persistence["executive_artifacts"]),
-            "canonical_facts": int(persistence["canonical_facts"]),
-            "canonical_inferences": int(persistence["canonical_inferences"]),
-        }
+        return (
+            _normalize(result),
+            elapsed_ms,
+            {
+                "durable": bool(persistence["durable"]),
+                "decision_receipts": int(persistence["decision_receipts"]),
+                "executive_artifacts": int(persistence["executive_artifacts"]),
+                "canonical_facts": int(persistence["canonical_facts"]),
+                "canonical_inferences": int(persistence["canonical_inferences"]),
+            },
+        )
     finally:
         runtime.database.close()
 
