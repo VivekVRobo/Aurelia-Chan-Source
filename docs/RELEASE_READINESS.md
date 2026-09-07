@@ -1,6 +1,6 @@
 # Aurelia Software Release Readiness
 
-Aurelia is still experimental software. This checklist defines when the current `0.6.0.dev0` line may be promoted to a tagged **pre-1.0 software release** without implying AGI, production-scale reliability, safety certification, open-source licensing, or physical autonomy.
+Aurelia is still experimental software. This checklist defines when the current `0.6.0` candidate may be tagged as a **pre-1.0 software release** without implying AGI, production-scale reliability, safety certification, open-source licensing, or physical autonomy.
 
 ## Allowed release statement
 
@@ -53,9 +53,9 @@ The release must remain explicit that model quality, production-scale performanc
 
 ## Packaging, docs, and legal status
 
-- [ ] `pyproject.toml` version matches the intended tag.
+- [ ] `pyproject.toml` version is exactly `0.6.0` and matches the intended tag.
 - [ ] `README.md` status and validation sections match the tagged tree.
-- [ ] `docs/COGNITIVE_CYCLE_EVIDENCE.md` matches the evidence runner.
+- [ ] `docs/validation/COGNITIVE_CYCLE_EVIDENCE.md` matches the evidence runner.
 - [ ] Quick-start commands have been reviewed against the tag.
 - [ ] Release notes list known limitations and optional Ollama dependency behavior.
 - [ ] Release notes explicitly state the current proprietary license/status; public source visibility is not described as an open-source grant.
@@ -63,7 +63,7 @@ The release must remain explicit that model quality, production-scale performanc
 
 ## Recommended first tagged release
 
-If the package version is promoted from `.dev0`, use a pre-1.0 version such as:
+Once every gate above passes on the exact release commit, create:
 
 `v0.6.0 — Deterministic Cognitive Runtime Evidence Release`
 
@@ -76,6 +76,6 @@ Do **not** use `v1.0.0` until the project has a deliberately defined stable publ
 3. `aurelia/execution/` + capability catalog — explicit execution architecture;
 4. `aurelia/runtime/persistence.py` + `aurelia/persistence/database.py` — durable state boundary;
 5. `aurelia/embodiment/` — actuator-free external embodiment contract;
-6. `tools/run_cognitive_cycle_evidence.py` + `docs/COGNITIVE_CYCLE_EVIDENCE.md` — deterministic proof;
+6. `tools/run_cognitive_cycle_evidence.py` + `docs/validation/COGNITIVE_CYCLE_EVIDENCE.md` — deterministic proof;
 7. `.github/workflows/aurelia-ci.yml` — four independent validation jobs;
 8. this checklist — exact release boundary.
