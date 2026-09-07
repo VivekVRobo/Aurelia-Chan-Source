@@ -19,7 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
       - name: Compile package
-        run: python -m compileall -q aurelia
+        run: python -m compileall -q aurelia tools
       - name: Lint stabilized runtime
         run: |
           ruff check \
@@ -38,6 +38,7 @@ jobs:
             aurelia/runtime/grounding.py \
             aurelia/runtime/health.py \
             aurelia/runtime/persistence.py \
+            tools/run_cognitive_cycle_evidence.py \
             tests/stabilization \
             tests/v4/test_v4_phase10_integration.py
           ruff format --check \
@@ -56,10 +57,19 @@ jobs:
             aurelia/runtime/grounding.py \
             aurelia/runtime/health.py \
             aurelia/runtime/persistence.py \
+            tools/run_cognitive_cycle_evidence.py \
             tests/stabilization \
             tests/v4/test_v4_phase10_integration.py
       - name: Stabilization regressions
         run: pytest -q tests/stabilization
+      - name: Deterministic cognitive-cycle evidence
+        run: python tools/run_cognitive_cycle_evidence.py --repetitions 5 --output reports/ci-cognitive-cycle-evidence.json
+      - name: Upload cognitive-cycle evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurelia-cognitive-cycle-evidence
+          path: reports/ci-cognitive-cycle-evidence.json
+          if-no-files-found: error
 
   legacy-v3:
     runs-on: ubuntu-latest
