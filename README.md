@@ -6,7 +6,7 @@
 
 The repository began as an interactive character and career-mentor experience. It has since grown into a broader engineering project: the current `main` branch contains a packaged cognitive runtime (`aurelia-cognitive-os`), stabilization suites, DAG execution, persistence, runtime health/grounding contracts, frontend integrity checks, and an explicit software-to-embodiment boundary.
 
-> **Engineering status:** active experimental software. The repository demonstrates architecture, software contracts, tests, and integration work. It is **not** a claim of AGI, production safety certification, or validated physical autonomy.
+> **Engineering status:** active experimental software. The repository demonstrates architecture, software contracts, tests, deterministic cognitive-cycle evidence, and integration work. It is **not** a claim of AGI, production safety certification, or validated physical autonomy.
 
 ## Project snapshot
 
@@ -17,10 +17,10 @@ The repository began as an interactive character and career-mentor experience. I
 | Planning/execution | Planner + capability registry + DAG execution |
 | State | Durable SQLite-backed runtime persistence |
 | Character layer | Persona renderer + expression/voice assets |
-| Embodiment | Explicit software contract and tested boundary |
+| Embodiment | Explicit actuator-free software contract and tested boundary |
 | Frontend | Browser character stage with source/contract integrity tests |
-| Local model path | Optional Ollama integration |
-| Validation | Stabilization, V3–V6, frontend integrity, lint/format CI |
+| Local model path | Optional Ollama integration with deterministic fallback |
+| Validation | Stabilization, V3–V6, frontend integrity, lint/format CI, repeated cognitive-cycle evidence |
 | Physical robot evidence | Not claimed by this repository |
 
 ## Why this project exists
@@ -169,16 +169,30 @@ pytest -q tests/v4 tests/v5 tests/v6
 npm run test:frontend
 ```
 
+### Deterministic cognitive-cycle evidence
+
+```bash
+python tools/run_cognitive_cycle_evidence.py \
+  --repetitions 5 \
+  --output reports/local-cognitive-cycle-evidence.json
+```
+
+The evidence runner creates a fresh durable SQLite database for every repetition and compares a normalized end-to-end trace containing response SHA-256, intent, DAG nodes, capabilities invoked, verification, grounding counts, persona state, durable persistence, artifact metadata, and the actuator-free `rci.character_response.v1` embodiment contract.
+
+Generated UUIDs, timestamps and temporary database paths are excluded from equality checks. The optional model call is forced onto Aurelia's deterministic fallback path for this fixture so the comparison does not depend on network/model-service availability.
+
+The report also records wall-clock latency samples, but labels them `current_process_and_host_only` with `performance_claim: false`; they are regression context, not a production performance claim. See [`docs/validation/COGNITIVE_CYCLE_EVIDENCE.md`](docs/validation/COGNITIVE_CYCLE_EVIDENCE.md).
+
 ### CI gates
 
 GitHub Actions currently separates validation into four jobs:
 
-1. **package-and-stabilization** — package install, compile, Ruff checks, formatting and stabilization regressions;
+1. **package-and-stabilization** — package install, compile, Ruff checks, formatting, stabilization regressions, and the repeated cognitive-cycle evidence artifact;
 2. **legacy-v3** — V3 regression suite;
 3. **cognitive-v4-v6** — V4/V5/V6 cognitive suites;
 4. **frontend-integrity** — JavaScript contract and source-integrity tests.
 
-This separation makes regressions easier to localize and prevents a green UI check from being mistaken for a green cognitive runtime.
+The first job uploads `aurelia-cognitive-cycle-evidence`, making the normalized trace and host-scoped timing baseline inspectable from CI. This separation makes regressions easier to localize and prevents a green UI check from being mistaken for a green cognitive runtime.
 
 ## Local model integration
 
@@ -206,9 +220,11 @@ These assets are presentation and production layers around the runtime; they sho
 - modular Python package structure;
 - durable application bootstrap and SQLite-backed state;
 - capability registration and DAG-oriented execution;
+- repeatable normalized cognitive-cycle traces across fresh runtime instances;
+- process-stable response hashes;
 - fail-closed runtime/API behavior;
 - persona/runtime separation;
-- embodiment software contract;
+- actuator-free embodiment software contract;
 - versioned automated regression suites;
 - frontend source/contract integrity checks.
 
@@ -217,6 +233,7 @@ These assets are presentation and production layers around the runtime; they sho
 - AGI or human-level general intelligence;
 - safety certification;
 - production reliability under large-scale load;
+- universal latency or throughput guarantees;
 - real-world robotic actuation;
 - physical perception, manipulation, or navigation evidence;
 - guaranteed correctness of model-generated content.
@@ -240,8 +257,10 @@ Aurelia-Chan-Source/
 │   ├── v4/
 │   ├── v5/
 │   └── v6/
+├── tools/                   # reproducible evidence utilities
 ├── frontend/                # browser contract/integrity layer
 ├── docs/architecture/       # architecture contracts
+├── docs/validation/         # evidence protocols
 ├── aurelia-canon/           # character canon + reference sheets
 ├── aurelia-expressions/     # expression assets
 ├── pipeline/                # character/3D production tooling
@@ -254,9 +273,9 @@ Aurelia-Chan-Source/
 
 The next high-value milestones are evidence-oriented rather than feature-count oriented:
 
-- [ ] publish a deterministic end-to-end cognitive-cycle fixture with a machine-readable result artifact;
-- [ ] add runtime latency and persistence-performance baselines;
-- [ ] document the capability registry and DAG schema with one reproducible trace;
+- [x] publish a deterministic end-to-end cognitive-cycle fixture with a machine-readable result artifact;
+- [x] add a host-scoped runtime latency baseline and per-run durable-persistence checks;
+- [x] document the capability/DAG execution path with one reproducible normalized trace;
 - [ ] add API contract examples for success and fail-closed behavior;
 - [ ] define a release-readiness checklist for the first tagged software release;
 - [ ] keep any future embodiment claims gated behind real integration evidence.
