@@ -12,7 +12,7 @@ The repository began as an interactive character and career-mentor experience. I
 
 | Area | Current state |
 | --- | --- |
-| Python package | `aurelia-cognitive-os` `0.6.0.dev0` |
+| Python package | `aurelia-cognitive-os` `0.6.0` |
 | Runtime | Flask-backed canonical application bootstrap |
 | Planning/execution | Planner + capability registry + DAG execution |
 | State | Durable SQLite-backed runtime persistence |
@@ -194,6 +194,8 @@ GitHub Actions currently separates validation into four jobs:
 
 The first job uploads `aurelia-cognitive-cycle-evidence`, making the normalized trace and host-scoped timing baseline inspectable from CI. This separation makes regressions easier to localize and prevents a green UI check from being mistaken for a green cognitive runtime.
 
+Release preparation is documented in [`docs/RELEASE_READINESS.md`](docs/RELEASE_READINESS.md), with copy-ready release text in [`docs/RELEASE_NOTES_DRAFT.md`](docs/RELEASE_NOTES_DRAFT.md).
+
 ## Local model integration
 
 Aurelia includes an optional local-model path built around Ollama. It is not required for installing or inspecting the software architecture.
@@ -277,7 +279,7 @@ The next high-value milestones are evidence-oriented rather than feature-count o
 - [x] add a host-scoped runtime latency baseline and per-run durable-persistence checks;
 - [x] document the capability/DAG execution path with one reproducible normalized trace;
 - [ ] add API contract examples for success and fail-closed behavior;
-- [ ] define a release-readiness checklist for the first tagged software release;
+- [x] define a release-readiness checklist for the first tagged software release;
 - [ ] keep any future embodiment claims gated behind real integration evidence.
 
 ## Contributing

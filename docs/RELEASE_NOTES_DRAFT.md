@@ -35,7 +35,7 @@ This repository is publicly viewable but currently proprietary. Public source vi
 
 ### Before tagging
 
-- change the package version from `0.6.0.dev0` to the intended release version;
+- confirm `pyproject.toml` reports package version `0.6.0`;
 - run all four CI jobs on the exact tag commit;
 - verify the five-run cognitive-cycle evidence artifact;
 - review quick-start and status text;
