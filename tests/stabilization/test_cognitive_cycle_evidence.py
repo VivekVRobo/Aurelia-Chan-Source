@@ -80,7 +80,7 @@ EXPECTED_API_RESPONSE_KEYS_NORMALIZED = {
 def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path: pathlib.Path):
     repo_root = pathlib.Path(__file__).resolve().parents[2]
     report_path = tmp_path / "cognitive-cycle-evidence.json"
-    subprocess.run(
+    completed = subprocess.run(
         [
             sys.executable,
             "tools/run_cognitive_cycle_evidence.py",
@@ -90,9 +90,13 @@ def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path:
             str(report_path),
         ],
         cwd=repo_root,
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
+    )
+    assert completed.returncode == 0, (
+        f"evidence runner failed (exit {completed.returncode})\n"
+        f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
     )
     report = json.loads(report_path.read_text(encoding="utf-8"))
 
