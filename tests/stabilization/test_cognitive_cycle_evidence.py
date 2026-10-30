@@ -30,6 +30,7 @@ EXPECTED_REPORT_KEYS = {
     "api_http_success_each_run",
     "api_response_contract_each_run",
     "deterministic_normalized_trace",
+    "determinism_differences",
     "durable_persistence_each_run",
     "one_decision_receipt_each_run",
     "verification_passed",
@@ -100,6 +101,7 @@ def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path:
         for key in (
             "all_checks_passed",
             "deterministic_normalized_trace",
+            "determinism_differences",
             "durable_persistence_each_run",
             "one_decision_receipt_each_run",
             "verification_passed",
@@ -119,6 +121,7 @@ def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path:
     assert report["api_http_success_each_run"] is True
     assert report["api_response_contract_each_run"] is True
     assert report["deterministic_normalized_trace"] is True
+    assert report["determinism_differences"] == []
     assert report["durable_persistence_each_run"] is True
     assert report["one_decision_receipt_each_run"] is True
     assert report["all_checks_passed"] is True
