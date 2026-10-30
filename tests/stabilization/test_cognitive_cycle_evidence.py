@@ -6,7 +6,6 @@ import pathlib
 import subprocess
 import sys
 
-
 EXPECTED_API_RESPONSE_KEYS = {
     "response",
     "expression",
