@@ -6,6 +6,7 @@ import json
 import platform
 import sqlite3
 import statistics
+import sys
 import tempfile
 import time
 from importlib.metadata import PackageNotFoundError, version
@@ -189,6 +190,9 @@ def _normalize(
 def _run_once(
     db_path: Path,
 ) -> tuple[dict[str, object], float, dict[str, object], dict[str, object], int]:
+    repository_root = str(Path(__file__).resolve().parents[1])
+    if repository_root not in sys.path:
+        sys.path.insert(0, repository_root)
     import integrated_backend as backend
 
     runtime = AureliaCognitiveRuntime(db_path=str(db_path))
