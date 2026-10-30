@@ -49,8 +49,8 @@ Generated decision/snapshot/artifact IDs, candidate IDs, timestamps, database pa
 ## Run locally
 
 ```bash
-python tools/run_cognitive_cycle_evidence.py \\
-  --repetitions 5 \\
+python tools/run_cognitive_cycle_evidence.py \
+  --repetitions 5 \
   --output reports/local-cognitive-cycle-evidence.json
 pytest -q tests/stabilization/test_cognitive_cycle_evidence.py
 ```
