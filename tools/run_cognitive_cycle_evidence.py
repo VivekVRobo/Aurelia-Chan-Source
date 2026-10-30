@@ -87,38 +87,105 @@ def _strip_volatile_fields(value: object) -> object:
     return value
 
 
+def _payload_shape(value: object) -> object:
+    """Describe payload structure without making generated values part of trace equality."""
+    if isinstance(value, dict):
+        return {
+            str(key): _payload_shape(item)
+            for key, item in sorted(value.items(), key=lambda entry: str(entry[0]))
+        }
+    if isinstance(value, list):
+        item_shapes = {
+            json.dumps(_payload_shape(item), sort_keys=True, separators=(",", ":"))
+            for item in value
+        }
+        return {
+            "type": "list",
+            "length": len(value),
+            "item_shapes": sorted(item_shapes),
+        }
+    if value is None:
+        return "null"
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, int):
+        return "integer"
+    if isinstance(value, float):
+        return "number"
+    if isinstance(value, str):
+        return "string"
+    return type(value).__name__
+
+
 def _normalize_api_response(api_response: dict[str, object]) -> dict[str, object]:
-    """Keep the serialized HTTP contract while excluding per-run identity fields."""
-    normalized = _strip_volatile_fields(api_response)
-    if not isinstance(normalized, dict):
-        raise TypeError("API response normalization did not produce an object")
+    """Keep the serialized HTTP contract while excluding per-run identity and payload values."""
+    trace = api_response.get("trace", {})
+    verification = api_response.get("verification", {})
+    persistence = api_response.get("persistence", {})
+    persona = api_response.get("persona", {})
+    character_response = api_response.get("character_response", {})
+    artifacts = api_response.get("artifacts", [])
+    if not all(
+        isinstance(value, dict)
+        for value in (trace, verification, persistence, persona, character_response)
+    ):
+        raise TypeError("API response contains a malformed structured contract")
+    if not isinstance(artifacts, list):
+        raise TypeError("API response artifacts contract must be a list")
 
-    normalized.pop("decision_id", None)
-    artifacts = normalized.get("artifacts", [])
-    if isinstance(artifacts, list):
-        for artifact in artifacts:
-            if isinstance(artifact, dict):
-                artifact.pop("id", None)
-
-    persistence = normalized.get("persistence")
-    if isinstance(persistence, dict):
-        approved_ids = persistence.pop("approved_memory_ids", [])
-        persistence["approved_memory_count"] = (
-            len(approved_ids) if isinstance(approved_ids, list) else 0
-        )
-        rejected_memory = persistence.get("rejected_memory", [])
-        if isinstance(rejected_memory, list):
-            persistence["rejected_memory"] = [
+    approved_ids = persistence.get("approved_memory_ids", [])
+    rejected_memory = persistence.get("rejected_memory", [])
+    response_text = str(api_response.get("response", ""))
+    normalized = {
+        "response": response_text,
+        "expression": api_response.get("expression"),
+        "portrait": api_response.get("portrait"),
+        "confidence": api_response.get("confidence"),
+        "persona": _strip_volatile_fields(persona),
+        "character_response": _strip_volatile_fields(character_response),
+        "trace": {
+            key: _strip_volatile_fields(trace[key])
+            for key in (
+                "understood",
+                "memories_count",
+                "graph_facts_count",
+                "specialists_invoked",
+                "alternatives_evaluated",
+                "numerical_checks",
+                "unresolved_unknowns",
+                "confidence_level",
+            )
+            if key in trace
+        },
+        "verification": _strip_volatile_fields(verification),
+        "persistence": {
+            "committed": persistence.get("committed"),
+            "durable": persistence.get("durable"),
+            "approved_memory_count": (
+                len(approved_ids) if isinstance(approved_ids, list) else 0
+            ),
+            "rejected_memory": [
                 {"reason": entry.get("reason")}
                 for entry in rejected_memory
                 if isinstance(entry, dict)
             ]
-
-    normalized["top_level_keys"] = sorted(api_response)
-    normalized["response_sha256"] = hashlib.sha256(
-        str(api_response.get("response", "")).encode("utf-8")
-    ).hexdigest()
-    normalized["contract_keys_match"] = set(api_response) == EXPECTED_API_RESPONSE_KEYS
+            if isinstance(rejected_memory, list)
+            else [],
+        },
+        "artifacts": [
+            {
+                "type": artifact.get("type"),
+                "title": artifact.get("title"),
+                "version": artifact.get("version"),
+                "payload_shape": _payload_shape(artifact.get("payload")),
+            }
+            for artifact in artifacts
+            if isinstance(artifact, dict)
+        ],
+        "top_level_keys": sorted(api_response),
+        "response_sha256": hashlib.sha256(response_text.encode("utf-8")).hexdigest(),
+        "contract_keys_match": set(api_response) == EXPECTED_API_RESPONSE_KEYS,
+    }
     return normalized
 
 
