@@ -6,13 +6,13 @@ import json
 import platform
 import sqlite3
 import statistics
-import sys
 import tempfile
 import time
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from unittest.mock import patch
 
+from aurelia.contracts.receipt import DecisionReceipt
 from aurelia.llm.ollama_cortex import LocalOllamaCortex
 from aurelia.runtime.app_bootstrap import _install_hardened_cognitive_cycle
 from aurelia.runtime.cognitive_runtime import AureliaCognitiveRuntime
@@ -123,7 +123,7 @@ def _normalize_api_response(api_response: dict[str, object]) -> dict[str, object
 
 def _normalize(
     api_response: dict[str, object],
-    receipt: object,
+    receipt: DecisionReceipt,
 ) -> dict[str, object]:
     """Project planner, verification, persistence and the actual API response."""
     normalized_api = _normalize_api_response(api_response)
@@ -253,14 +253,20 @@ def run_campaign(repetitions: int) -> dict[str, object]:
     normalized_runs: list[dict[str, object]] = []
     elapsed_ms: list[float] = []
     persistence_runs: list[dict[str, object]] = []
+    api_response_samples: list[dict[str, object]] = []
+    http_status_codes: list[int] = []
 
     with tempfile.TemporaryDirectory(prefix="aurelia-evidence-") as tmp:
         root = Path(tmp)
         for index in range(repetitions):
-            normalized, elapsed, persistence = _run_once(root / f"run-{index}.db")
+            normalized, elapsed, persistence, api_response, status_code = _run_once(
+                root / f"run-{index}.db"
+            )
             normalized_runs.append(normalized)
             elapsed_ms.append(elapsed)
             persistence_runs.append(persistence)
+            api_response_samples.append(api_response)
+            http_status_codes.append(status_code)
 
     representative = normalized_runs[0]
     deterministic = all(run == representative for run in normalized_runs[1:])
@@ -268,9 +274,18 @@ def run_campaign(repetitions: int) -> dict[str, object]:
     one_receipt_each_run = all(int(run["decision_receipts"]) == 1 for run in persistence_runs)
     verified = bool(representative["verification"]["passed"])  # type: ignore[index]
     embodiment_verified = bool(representative["embodiment"]["verified"])  # type: ignore[index]
+    api_response_contract_each_run = all(
+        bool(run["api_response_contract_valid"]) for run in normalized_runs
+    )
+    api_http_success_each_run = all(status_code == 200 for status_code in http_status_codes)
 
     canonical = json.dumps(representative, sort_keys=True, separators=(",", ":")).encode()
     stable_sha256 = hashlib.sha256(canonical).hexdigest()
+    normalized_api_response = representative["api_response"]
+    api_canonical = json.dumps(
+        normalized_api_response, sort_keys=True, separators=(",", ":")
+    ).encode()
+    normalized_api_sha256 = hashlib.sha256(api_canonical).hexdigest()
 
     result: dict[str, object] = {
         "schema_version": "aurelia.cognitive_cycle_evidence.v1",
@@ -279,9 +294,15 @@ def run_campaign(repetitions: int) -> dict[str, object]:
             "query": FIXTURE_QUERY,
             "user_role": FIXTURE_USER_ROLE,
             "target_role": FIXTURE_TARGET_ROLE,
+            "endpoint": "POST /api/cognitive-cycle",
             "local_model_mode": "forced_deterministic_fallback",
+            "database_strategy": "fresh_temporary_sqlite_per_repetition",
         },
+        "runtime_environment": _runtime_metadata(),
         "run_count": repetitions,
+        "api_http_status_codes": http_status_codes,
+        "api_http_success_each_run": api_http_success_each_run,
+        "api_response_contract_each_run": api_response_contract_each_run,
         "deterministic_normalized_trace": deterministic,
         "durable_persistence_each_run": durable_each_run,
         "one_decision_receipt_each_run": one_receipt_each_run,
@@ -293,9 +314,13 @@ def run_campaign(repetitions: int) -> dict[str, object]:
             and one_receipt_each_run
             and verified
             and embodiment_verified
+            and api_response_contract_each_run
+            and api_http_success_each_run
         ),
         "normalized_trace_sha256": stable_sha256,
+        "normalized_api_response_sha256": normalized_api_sha256,
         "representative_trace": representative,
+        "api_response_sample": api_response_samples[0],
         "persistence_runs": persistence_runs,
         "latency_baseline": {
             "scope": "current_process_and_host_only",
