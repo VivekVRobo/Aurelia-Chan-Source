@@ -95,13 +95,21 @@ def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path:
         text=True,
     )
     report = json.loads(report_path.read_text(encoding="utf-8"))
+    check_summary = {
+        key: report.get(key)
+        for key in (
+            "all_checks_passed",
+            "deterministic_normalized_trace",
+            "durable_persistence_each_run",
+            "one_decision_receipt_each_run",
+            "verification_passed",
+            "embodiment_contract_verified",
+            "api_response_contract_each_run",
+            "api_http_success_each_run",
+        )
+    }
     assert completed.returncode == 0, (
-        f"evidence runner failed (exit {completed.returncode}); "
-        f"checks={{key: report.get(key) for key in ('all_checks_passed', "
-        f"'deterministic_normalized_trace', 'durable_persistence_each_run', "
-        f"'one_decision_receipt_each_run', 'verification_passed', "
-        f"'embodiment_contract_verified', 'api_response_contract_each_run', "
-        f"'api_http_success_each_run')}}\n"
+        f"evidence runner failed (exit {completed.returncode}); checks={check_summary}\n"
         f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
     )
 
