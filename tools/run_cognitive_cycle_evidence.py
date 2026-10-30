@@ -315,6 +315,29 @@ def _run_once(
         runtime.database.close()
 
 
+def _difference_paths(left: object, right: object, prefix: str = "") -> list[str]:
+    """Return stable field paths that differ between two normalized JSON-like values."""
+    if type(left) is not type(right):
+        return [prefix or "$"]
+    if isinstance(left, dict) and isinstance(right, dict):
+        differences: list[str] = []
+        for key in sorted(set(left) | set(right), key=str):
+            path = f"{prefix}.{key}" if prefix else str(key)
+            if key not in left or key not in right:
+                differences.append(path)
+            else:
+                differences.extend(_difference_paths(left[key], right[key], path))
+        return differences
+    if isinstance(left, list) and isinstance(right, list):
+        differences = []
+        if len(left) != len(right):
+            differences.append(f"{prefix}.length")
+        for index, (left_item, right_item) in enumerate(zip(left, right)):
+            differences.extend(_difference_paths(left_item, right_item, f"{prefix}[{index}]"))
+        return differences
+    return [] if left == right else [prefix or "$"]
+
+
 def run_campaign(repetitions: int) -> dict[str, object]:
     if repetitions < 2:
         raise ValueError("repetitions must be at least 2")
@@ -338,7 +361,14 @@ def run_campaign(repetitions: int) -> dict[str, object]:
             http_status_codes.append(status_code)
 
     representative = normalized_runs[0]
-    deterministic = all(run == representative for run in normalized_runs[1:])
+    determinism_differences = sorted(
+        {
+            path
+            for run in normalized_runs[1:]
+            for path in _difference_paths(representative, run)
+        }
+    )
+    deterministic = not determinism_differences
     durable_each_run = all(bool(run["durable"]) for run in persistence_runs)
     one_receipt_each_run = all(int(run["decision_receipts"]) == 1 for run in persistence_runs)
     verified = bool(representative["verification"]["passed"])  # type: ignore[index]
@@ -373,6 +403,7 @@ def run_campaign(repetitions: int) -> dict[str, object]:
         "api_http_success_each_run": api_http_success_each_run,
         "api_response_contract_each_run": api_response_contract_each_run,
         "deterministic_normalized_trace": deterministic,
+        "determinism_differences": determinism_differences,
         "durable_persistence_each_run": durable_each_run,
         "one_decision_receipt_each_run": one_receipt_each_run,
         "verification_passed": verified,
