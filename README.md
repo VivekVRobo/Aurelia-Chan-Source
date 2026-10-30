@@ -215,6 +215,8 @@ The cognitive runtime is only one part of Aurelia. The repository also retains t
 
 These assets are presentation and production layers around the runtime; they should not be interpreted as evidence of autonomous physical embodiment.
 
+The evidence runner now exercises the canonical Flask endpoint with a disposable SQLite database for each repetition. Its JSON report includes the actual representative API response, a normalized response projection for cross-run comparison, planner and verification details, runtime/environment metadata, HTTP status checks, and explicit response-contract regression checks. Run `pytest -q tests/stabilization/test_cognitive_cycle_evidence.py` to validate the report and API field contract. Generated identifiers and host-specific timing are kept out of normalized equality checks; the raw representative response remains available for inspection.
+
 ## Evidence and maturity boundaries
 
 ### Demonstrated in the repository
