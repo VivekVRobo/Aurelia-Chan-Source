@@ -57,7 +57,7 @@ pytest -q tests/stabilization/test_cognitive_cycle_evidence.py
 
 GitHub Actions uploads the generated report as `aurelia-cognitive-cycle-evidence`. The evidence job fails when normalized traces diverge, the API does not return HTTP 200, the serialized response keys drift from the explicit contract, persistence is not durable, the receipt count is wrong, verification fails, or the embodiment contract is not verified.
 
-The regression test locks the report schema, normalized trace schema, and expected top-level API response keys. An intentional API or evidence-contract change must update the contract and its test together.
+The report includes the normalized field paths that diverge when repeated traces differ. The regression test locks the report schema, normalized trace schema, and expected top-level API response keys. An intentional API or evidence-contract change must update the contract and its test together.
 
 ## Latency field
 
