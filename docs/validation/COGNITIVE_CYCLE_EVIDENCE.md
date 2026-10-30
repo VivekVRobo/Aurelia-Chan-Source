@@ -44,7 +44,7 @@ The raw representative API response is also included as `api_response_sample` fo
 
 The artifact records package/Python versions, Python implementation, operating system and release, machine architecture, SQLite version, deterministic-model mode, and disposable-database strategy.
 
-Generated decision/snapshot/artifact IDs, candidate IDs, timestamps, database paths, and runtime measurements are not used for equality checks. Persistence identifiers are represented by counts and rejection reasons. Artifact payload values remain in the raw representative API response; the normalized comparison records payload structure and value types, avoiding false divergence from generated IDs or timestamps. Host metadata and latency measurements remain outside the normalized trace so comparable behavior can be checked across runs without pretending that different hosts are identical.
+Generated decision/interaction/snapshot/artifact IDs, candidate IDs, timestamps, database paths, and runtime measurements are not used for equality checks. Persistence identifiers are represented by counts and rejection reasons. Artifact payload values remain in the raw representative API response; the normalized comparison records payload structure and value types, avoiding false divergence from generated IDs or timestamps. Host metadata and latency measurements remain outside the normalized trace so comparable behavior can be checked across runs without pretending that different hosts are identical.
 
 ## Run locally
 
