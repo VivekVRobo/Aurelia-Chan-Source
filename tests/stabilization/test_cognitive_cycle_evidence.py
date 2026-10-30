@@ -161,6 +161,10 @@ def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path:
     assert set(api_response) == EXPECTED_API_RESPONSE_KEYS_NORMALIZED
     assert api_response["top_level_keys"] == sorted(EXPECTED_API_RESPONSE_KEYS)
     assert api_response["contract_keys_match"] is True
+    assert all(
+        set(artifact) == {"type", "title", "version", "payload_shape"}
+        for artifact in api_response["artifacts"]
+    )
     assert api_response["response_sha256"] == trace["response_sha256"]
     assert report["api_response_sample"]["decision_id"]
     assert len(report["normalized_trace_sha256"]) == 64
