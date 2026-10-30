@@ -161,9 +161,7 @@ def _normalize_api_response(api_response: dict[str, object]) -> dict[str, object
         "persistence": {
             "committed": persistence.get("committed"),
             "durable": persistence.get("durable"),
-            "approved_memory_count": (
-                len(approved_ids) if isinstance(approved_ids, list) else 0
-            ),
+            "approved_memory_count": (len(approved_ids) if isinstance(approved_ids, list) else 0),
             "rejected_memory": [
                 {"reason": entry.get("reason")}
                 for entry in rejected_memory
