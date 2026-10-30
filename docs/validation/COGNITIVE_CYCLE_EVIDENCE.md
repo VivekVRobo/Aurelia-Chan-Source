@@ -6,7 +6,7 @@ This protocol turns Aurelia's deterministic replay checks into a machine-readabl
 
 Every repetition creates a fresh durable SQLite database and sends the same fixed request through the canonical Flask handler:
 
-\`\`\`text
+```text
 POST /api/cognitive-cycle
   -> SemanticMeaningEngine
   -> CognitiveRouter
@@ -21,7 +21,7 @@ POST /api/cognitive-cycle
   -> AureliaEmbodimentAdapter
   -> rci.character_response.v1
   -> serialize_cognitive_cycle JSON response
-\`\`\`
+```
 
 The optional local-model call is forced onto the deterministic fallback path. The evidence runner uses Flask's test client, checks the HTTP status, and records one actual serialized API response sample. The same run's runtime receipt is used to record planner output, DAG order, selected hypothesis, invoked capabilities, and critic scores.
 
@@ -38,7 +38,7 @@ The normalized trace retains engineering-relevant behavior:
 - artifact types, titles, versions, and normalized payloads;
 - the structured API response contract, including its field set and response hash.
 
-The raw representative API response is also included as \`api_response_sample\` for inspection. Generated identifiers are retained in that sample but excluded from normalized comparisons.
+The raw representative API response is also included as `api_response_sample` for inspection. Generated identifiers are retained in that sample but excluded from normalized comparisons.
 
 ## Runtime metadata and normalization
 
@@ -48,14 +48,14 @@ Generated decision/snapshot/artifact IDs, candidate IDs, timestamps, database pa
 
 ## Run locally
 
-\`\`\`bash
+```bash
 python tools/run_cognitive_cycle_evidence.py \\
   --repetitions 5 \\
   --output reports/local-cognitive-cycle-evidence.json
 pytest -q tests/stabilization/test_cognitive_cycle_evidence.py
-\`\`\`
+```
 
-GitHub Actions uploads the generated report as \`aurelia-cognitive-cycle-evidence\`. The evidence job fails when normalized traces diverge, the API does not return HTTP 200, the serialized response keys drift from the explicit contract, persistence is not durable, the receipt count is wrong, verification fails, or the embodiment contract is not verified.
+GitHub Actions uploads the generated report as `aurelia-cognitive-cycle-evidence`. The evidence job fails when normalized traces diverge, the API does not return HTTP 200, the serialized response keys drift from the explicit contract, persistence is not durable, the receipt count is wrong, verification fails, or the embodiment contract is not verified.
 
 The regression test locks the report schema, normalized trace schema, and expected top-level API response keys. An intentional API or evidence-contract change must update the contract and its test together.
 
@@ -63,10 +63,10 @@ The regression test locks the report schema, normalized trace schema, and expect
 
 The artifact records per-run wall-clock duration plus mean/median/min/max. These values are explicitly labeled:
 
-\`\`\`text
+```text
 scope: current_process_and_host_only
 performance_claim: false
-\`\`\`
+```
 
 They are useful for spotting large regressions on comparable environments, but they are not production-scale throughput or latency claims.
 
