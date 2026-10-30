@@ -362,11 +362,7 @@ def run_campaign(repetitions: int) -> dict[str, object]:
 
     representative = normalized_runs[0]
     determinism_differences = sorted(
-        {
-            path
-            for run in normalized_runs[1:]
-            for path in _difference_paths(representative, run)
-        }
+        {path for run in normalized_runs[1:] for path in _difference_paths(representative, run)}
     )
     deterministic = not determinism_differences
     durable_each_run = all(bool(run["durable"]) for run in persistence_runs)
