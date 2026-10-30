@@ -34,12 +34,12 @@ EXPECTED_API_RESPONSE_KEYS = frozenset(
         "persistence",
         "artifacts",
         "decision_id",
-        "interaction_id",
     }
 )
 VOLATILE_API_KEYS = frozenset(
     {
         "decision_id",
+        "interaction_id",
         "snapshot_id",
         "created_at",
         "updated_at",
