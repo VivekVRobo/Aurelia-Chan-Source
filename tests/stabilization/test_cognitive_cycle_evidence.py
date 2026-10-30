@@ -2,9 +2,24 @@
 
 import hashlib
 import json
+import subprocess
+import sys
+from pathlib import Path
 
-from tools.run_cognitive_cycle_evidence import EXPECTED_API_RESPONSE_KEYS, run_campaign
 
+EXPECTED_API_RESPONSE_KEYS = {
+    "response",
+    "expression",
+    "portrait",
+    "confidence",
+    "persona",
+    "character_response",
+    "trace",
+    "verification",
+    "persistence",
+    "artifacts",
+    "decision_id",
+}
 
 EXPECTED_REPORT_KEYS = {
     "schema_version",
@@ -63,8 +78,24 @@ EXPECTED_API_RESPONSE_KEYS_NORMALIZED = {
 }
 
 
-def test_cognitive_cycle_evidence_contract_and_api_response_are_stable():
-    report = run_campaign(2)
+def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path: Path):
+    repo_root = Path(__file__).resolve().parents[2]
+    report_path = tmp_path / "cognitive-cycle-evidence.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "tools/run_cognitive_cycle_evidence.py",
+            "--repetitions",
+            "2",
+            "--output",
+            str(report_path),
+        ],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    report = json.loads(report_path.read_text(encoding="utf-8"))
 
     assert set(report) == EXPECTED_REPORT_KEYS
     assert report["schema_version"] == "aurelia.cognitive_cycle_evidence.v1"
