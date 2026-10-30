@@ -2,9 +2,9 @@
 
 import hashlib
 import json
+import pathlib
 import subprocess
 import sys
-from pathlib import Path
 
 
 EXPECTED_API_RESPONSE_KEYS = {
@@ -78,8 +78,8 @@ EXPECTED_API_RESPONSE_KEYS_NORMALIZED = {
 }
 
 
-def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path: Path):
-    repo_root = Path(__file__).resolve().parents[2]
+def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path: pathlib.Path):
+    repo_root = pathlib.Path(__file__).resolve().parents[2]
     report_path = tmp_path / "cognitive-cycle-evidence.json"
     subprocess.run(
         [
