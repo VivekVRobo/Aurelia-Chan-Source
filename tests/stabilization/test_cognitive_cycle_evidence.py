@@ -94,11 +94,16 @@ def test_cognitive_cycle_evidence_contract_and_api_response_are_stable(tmp_path:
         capture_output=True,
         text=True,
     )
+    report = json.loads(report_path.read_text(encoding="utf-8"))
     assert completed.returncode == 0, (
-        f"evidence runner failed (exit {completed.returncode})\n"
+        f"evidence runner failed (exit {completed.returncode}); "
+        f"checks={{key: report.get(key) for key in ('all_checks_passed', "
+        f"'deterministic_normalized_trace', 'durable_persistence_each_run', "
+        f"'one_decision_receipt_each_run', 'verification_passed', "
+        f"'embodiment_contract_verified', 'api_response_contract_each_run', "
+        f"'api_http_success_each_run')}}\n"
         f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
     )
-    report = json.loads(report_path.read_text(encoding="utf-8"))
 
     assert set(report) == EXPECTED_REPORT_KEYS
     assert report["schema_version"] == "aurelia.cognitive_cycle_evidence.v1"
