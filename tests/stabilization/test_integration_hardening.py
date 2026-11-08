@@ -112,6 +112,31 @@ class TestIntegrationHardening(unittest.TestCase):
         self.assertIn("unavailable", data["error"].lower())
         self.assertNotIn("response", data)
 
+    def test_missing_message_fails_closed_without_runtime_execution(self) -> None:
+        before = self.runtime.database.count_rows("decision_receipts")
+        response = self.client.post("/api/cognitive-cycle", json={"message": "   "})
+
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertFalse(data["safe_to_publish"])
+        self.assertEqual(data["error"], "No message provided")
+        self.assertEqual(self.runtime.database.count_rows("decision_receipts"), before)
+
+    def test_unexpected_runtime_failure_returns_generic_non_publishable_error(self) -> None:
+        with patch.object(self.runtime, "process_query", side_effect=RuntimeError("secret detail")):
+            response = self.client.post(
+                "/api/cognitive-cycle",
+                json={"message": "Give me guidance."},
+            )
+
+        self.assertEqual(response.status_code, 500)
+        data = response.get_json()
+        self.assertFalse(data["safe_to_publish"])
+        self.assertEqual(data["error_type"], "RuntimeError")
+        self.assertEqual(data["error"], "Aurelia cognitive cycle failed unexpectedly.")
+        self.assertNotIn("secret detail", str(data))
+        self.assertNotIn("response", data)
+
     def test_cognitive_failure_returns_non_publishable_error_and_writes_nothing(self) -> None:
         before = self.runtime.database.count_rows("decision_receipts")
         with patch.object(
