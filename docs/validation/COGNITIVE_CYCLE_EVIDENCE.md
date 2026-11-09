@@ -23,6 +23,17 @@ SemanticMeaningEngine
 
 The optional local-model call is deliberately forced onto the deterministic fallback path so repeated runs can be compared without depending on network access or a model service.
 
+## Fixed fixture
+
+The evidence runner defines one fixed software fixture:
+
+- query: `How should I prepare for a Director of Engineering promotion?`
+- user role: `Senior Engineering Manager`
+- target role: `Director of Engineering`
+- model mode: deterministic local fallback
+
+This fixture is intentionally software-only and does not require proprietary credentials or physical hardware.
+
 ## Normalized trace
 
 Generated UUIDs, timestamps and database paths are intentionally excluded from equality checks. The normalized trace retains engineering-relevant behavior:
@@ -40,6 +51,17 @@ Generated UUIDs, timestamps and database paths are intentionally excluded from e
 
 Five fresh-runtime executions are used in CI by default. The job fails if the normalized traces diverge, durable persistence is not observed on every run, one decision receipt is not stored per run, verification fails, or the embodiment contract is not verified.
 
+## Environment metadata
+
+The generated JSON report also records reproducibility metadata outside the normalized trace:
+
+- Git revision, using `GITHUB_SHA` in CI and the current Git revision locally;
+- Python version and implementation;
+- operating-system/platform release and machine architecture;
+- installed `aurelia-cognitive-os` package version.
+
+Environment metadata is descriptive provenance. It is not treated as part of the deterministic equality comparison, because equivalent software traces may legitimately be executed on different hosts.
+
 ## Run locally
 
 ```bash
@@ -49,6 +71,8 @@ python tools/run_cognitive_cycle_evidence.py \
 ```
 
 GitHub Actions uploads the same report as `aurelia-cognitive-cycle-evidence`.
+
+The stabilization suite also checks that the environment metadata contains the required reproducibility fields.
 
 ## Latency field
 
