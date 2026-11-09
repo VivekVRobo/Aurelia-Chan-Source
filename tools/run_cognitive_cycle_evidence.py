@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
+import os
+import platform
 import statistics
+import subprocess
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -16,6 +21,43 @@ from aurelia.runtime.cognitive_runtime import AureliaCognitiveRuntime, Cognitive
 FIXTURE_QUERY = "How should I prepare for a Director of Engineering promotion?"
 FIXTURE_USER_ROLE = "Senior Engineering Manager"
 FIXTURE_TARGET_ROLE = "Director of Engineering"
+
+
+def _git_revision() -> str:
+    configured = os.environ.get("GITHUB_SHA")
+    if configured:
+        return configured
+    try:
+        return subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "unknown"
+
+
+def _environment_metadata() -> dict[str, object]:
+    try:
+        package_version = importlib.metadata.version("aurelia-cognitive-os")
+    except importlib.metadata.PackageNotFoundError:
+        package_version = "unknown"
+
+    return {
+        "git_sha": _git_revision(),
+        "python": {
+            "version": platform.python_version(),
+            "implementation": sys.implementation.name,
+        },
+        "platform": {
+            "system": platform.system(),
+            "release": platform.release(),
+            "machine": platform.machine(),
+            "platform": platform.platform(),
+        },
+        "aurelia_package_version": package_version,
+    }
 
 
 def _normalize(result: CognitiveCycleResponse) -> dict[str, object]:
@@ -138,6 +180,7 @@ def run_campaign(repetitions: int) -> dict[str, object]:
             "target_role": FIXTURE_TARGET_ROLE,
             "local_model_mode": "forced_deterministic_fallback",
         },
+        "environment": _environment_metadata(),
         "run_count": repetitions,
         "deterministic_normalized_trace": deterministic,
         "durable_persistence_each_run": durable_each_run,
